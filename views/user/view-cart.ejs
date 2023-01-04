@@ -1,0 +1,191 @@
+<main class="main">
+  <section class="mt-50 mb-50">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="table-responsive">
+            <table class="table shopping-summery text-center clean">
+              <thead>
+                <tr class="main-heading">
+                  <th scope="col">Image</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Price</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">Subtotal</th>
+                  <th scope="col">Remove</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <% cartItems.forEach(function(cartItems){%>
+                <tr>
+                  <td>
+                    <img src="/uploads/<%=cartItems.cartItems.Image %>" />
+                  </td>
+                  <td class="product-des product-name">
+                    <h5 class="product-name">
+                      <a href="shop-product-right.html"
+                        ><%=cartItems.cartItems.Productname%></a
+                      >
+                    </h5>
+                    <p class="font-xs"><%=cartItems.cartItems.category%></p>
+                    <p class="font-xs">
+                      <%=cartItems.cartItems.ProductDescription%>
+                    </p>
+                  </td>
+                  <td class="price" cartItemss-title="Price">
+                    <span><%=cartItems.cartItems.Price%> </span>
+                  </td>
+                  <td class="text-center" cartItemss-title="Stock">
+                    <div class="">
+                      <button
+                        style="min-width: 26"
+                        class="btn btn-decrement btn-spinner"
+                        id="decrement"
+                        onclick="changeQuantity('<%-cartItems._id%>','<%-cartItems.item%>',-1,)"
+                        type="button"
+                      >
+                        <i class="icon-minus"></i>
+                      </button>
+                      <input
+                        type="text"
+                        disabled="disabled"
+                        style="text-align: center"
+                        class="border-0 form-control"
+                        value="<%-cartItems.quantity%>"
+                        min="1"
+                        step="1"
+                        data-decimals="0"
+                      />
+                      <button
+                        id="plusBtn"
+                        style="min-width: 26"
+                        class="btn btn-increment btn-spinner"
+                        onclick="changeQuantity('<%-cartItems._id%>','<%-cartItems.item%>',1,)"
+                        type="button"
+                      >
+                        <i class="icon-plus"></i>
+                      </button>
+                    </div>
+                  </td>
+                  <td class="text-right" cartItemss-title="cartItems">
+                    <span>hlo </span>
+                  </td>
+                  <td class="action" cartItemss-title="Remove">
+                    <a href="#" class="text-muted"
+                      ><i class="fi-rs-trash"></i
+                    ></a>
+                  </td>
+                </tr>
+
+                <%}) %>
+              </tbody>
+            </table>
+          </div>
+          <div class="cartItems-action text-end">
+            <a class="btn mr-10 mb-sm-15"
+              ><i class="fi-rs-shuffle mr-10"></i>Update cartItems</a
+            >
+            <a class="btn"
+              ><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a
+            >
+          </div>
+          <div class="divider center_icon mt-50 mb-50">
+            <i class="fi-rs-fingerprint"></i>
+          </div>
+          <div class="row mb-50">
+            <div class="col-lg-6 col-md-12">
+              <div class="mb-30 mt-50">
+                <div class="heading_s1 mb-3">
+                  <h4>Apply Coupon</h4>
+                </div>
+                <div class="total-amount">
+                  <div class="left">
+                    <div class="coupon">
+                      <form action="/cartItems" target="_blank">
+                        <div class="form-row row justify-content-center">
+                          <div class="form-group col-lg-6">
+                            <input
+                              class="font-medium"
+                              name="Coupon"
+                              placeholder="Enter Your Coupon"
+                            />
+                          </div>
+                          <div class="form-group col-lg-6">
+                            <button class="btn btn-sm">
+                              <i class="fi-rs-label mr-10"></i>Apply
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6 col-md-12">
+              <div class="border p-md-4 p-30 border-radius cartItems-totals">
+                <div class="heading_s1 mb-3">
+                  <h4>cartItems Totals</h4>
+                </div>
+                <div class="table-responsive">
+                  <table class="table">
+                    <tbody>
+                      <tr>
+                        <td class="cartItems_total_label">
+                          cartItems Subtotal
+                        </td>
+                        <td class="cartItems_total_amount">
+                          <span class="font-lg fw-900 text-brand">$240.00</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="cartItems_total_label">Shipping</td>
+                        <td class="cartItems_total_amount">
+                          <i class="ti-gift mr-5"></i> Free Shipping
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="cartItems_total_label">Total</td>
+                        <td class="cartItems_total_amount">
+                          <strong
+                            ><span class="font-xl fw-900 text-brand"
+                              >$240.00</span
+                            ></strong
+                          >
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <a href="#" class="btn">
+                  <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  function changeQuantity(cartId, prodId, count) {
+    let quantity = parseInt(document.getElementById(prodId).innerHTML);
+    count = parseInt(count);
+
+    $.ajax({
+      url: "/change_product_quantity",
+      data: {
+        cart: cartId,
+        product: prodId,
+        count: count,
+      },
+      method: "post",
+      success: (response) => {
+        alert(response);
+      },
+    });
+  }
+</script>
