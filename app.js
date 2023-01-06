@@ -4,7 +4,9 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const expressLayouts = require("express-ejs-layouts");
-const session= require('express-session')
+const session = require("express-session");
+
+//sweet alert
 
 // DB connection
 
@@ -25,14 +27,20 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "public/admin-assets")));
-app.use(session({secret:"key", resave: true,saveUninitialized: true,cookie:{maxAge:600000}}))
-
+app.use(
+  session({
+    secret: "key",
+    resave: true,
+    saveUninitialized: true,
+    cookie: { maxAge: 600000 },
+  })
+);
 
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {    
+app.use(function (req, res, next) {
   next(createError(404));
 });
 

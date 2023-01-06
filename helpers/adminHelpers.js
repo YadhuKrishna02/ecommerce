@@ -1,7 +1,6 @@
 const { response } = require("express");
 const user = require("../models/connection");
 
-let existingCategory;
 module.exports = {
   getUsers: () => {
     console.log(user);
@@ -48,9 +47,11 @@ module.exports = {
         categoryName: category,
       });
       if (existingCategory) {
+        console.log("category exists");
         response = { categoryStatus: true };
         resolve(response);
       } else {
+        console.log("category not exist");
         const categoryData = new user.categories({
           categoryName: data.categoryname,
         });
@@ -168,7 +169,6 @@ module.exports = {
   },
   postEditProduct: (productId, editedData, filename) => {
     return new Promise(async (resolve, reject) => {
-      console.log(editedData);
       await user.product
         .updateOne(
           { _id: productId },

@@ -11,7 +11,7 @@
                   <th scope="col">Name</th>
                   <th scope="col">Price</th>
                   <th scope="col">Quantity</th>
-                  <th scope="col">Subtotal</th>
+                  <!-- <th scope="col">Subtotal</th> -->
                   <th scope="col">Remove</th>
                 </tr>
               </thead>
@@ -37,44 +37,34 @@
                     <span><%=cartItems.cartItems.Price%> </span>
                   </td>
                   <td class="text-center" cartItemss-title="Stock">
-                    <div class="">
+                    <div class>
                       <button
-                        style="min-width: 26"
-                        class="btn btn-decrement btn-spinner"
-                        id="decrement"
-                        onclick="changeQuantity('<%-cartItems._id%>','<%-cartItems.item%>',-1,)"
-                        type="button"
+                        class="cart-item-count mr-5"
+                        onclick="changeQuantity('<%= cartItems._id%>','<%= cartItems.item %>','<%= userId.id %>',-1)"
                       >
-                        <i class="icon-minus"></i>
+                        -
                       </button>
-                      <input
-                        type="text"
-                        disabled="disabled"
-                        style="text-align: center"
-                        class="border-0 form-control"
-                        value="<%-cartItems.quantity%>"
-                        min="1"
-                        step="1"
-                        data-decimals="0"
-                      />
-                      <button
-                        id="plusBtn"
-                        style="min-width: 26"
-                        class="btn btn-increment btn-spinner"
-                        onclick="changeQuantity('<%-cartItems._id%>','<%-cartItems.item%>',1,)"
-                        type="button"
+                      <span id="<%= cartItems.item %>"
+                        ><%= cartItems.quantity%></span
                       >
-                        <i class="icon-plus"></i>
+                      <button
+                        class="cart-item-count ml-5"
+                        onclick="changeQuantity('<%= cartItems._id%>','<%= cartItems.item %>','<%= userId.id %>',1)"
+                      >
+                        +
                       </button>
                     </div>
                   </td>
-                  <td class="text-right" cartItemss-title="cartItems">
-                    <span>hlo </span>
-                  </td>
+                  <!-- <td class="text-right" cartItemss-title="cartItems">
+                                            <span>hlo </span>
+                                        </td> -->
                   <td class="action" cartItemss-title="Remove">
-                    <a href="#" class="text-muted"
-                      ><i class="fi-rs-trash"></i
-                    ></a>
+                    <button
+                      class="text-muted"
+                      onclick="removeItem('<%-cartItems._id%>','<%-cartItems.item%>')"
+                    >
+                      <i class="fi-rs-trash"></i>
+                    </button>
                   </td>
                 </tr>
 
@@ -82,14 +72,7 @@
               </tbody>
             </table>
           </div>
-          <div class="cartItems-action text-end">
-            <a class="btn mr-10 mb-sm-15"
-              ><i class="fi-rs-shuffle mr-10"></i>Update cartItems</a
-            >
-            <a class="btn"
-              ><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a
-            >
-          </div>
+
           <div class="divider center_icon mt-50 mb-50">
             <i class="fi-rs-fingerprint"></i>
           </div>
@@ -126,7 +109,7 @@
             <div class="col-lg-6 col-md-12">
               <div class="border p-md-4 p-30 border-radius cartItems-totals">
                 <div class="heading_s1 mb-3">
-                  <h4>cartItems Totals</h4>
+                  <h4>Price Details</h4>
                 </div>
                 <div class="table-responsive">
                   <table class="table">
@@ -136,7 +119,9 @@
                           cartItems Subtotal
                         </td>
                         <td class="cartItems_total_amount">
-                          <span class="font-lg fw-900 text-brand">$240.00</span>
+                          ₹<span id="subtotal" class="font-lg fw-900 text-brand"
+                            ><%= total%></span
+                          >
                         </td>
                       </tr>
                       <tr>
@@ -149,8 +134,8 @@
                         <td class="cartItems_total_label">Total</td>
                         <td class="cartItems_total_amount">
                           <strong
-                            ><span class="font-xl fw-900 text-brand"
-                              >$240.00</span
+                            >₹<span id="total" class="font-xl fw-900 text-brand"
+                              ><%= total%></span
                             ></strong
                           >
                         </td>
@@ -171,20 +156,45 @@
 </main>
 
 <script>
-  function changeQuantity(cartId, prodId, count) {
-    let quantity = parseInt(document.getElementById(prodId).innerHTML);
+  function changeQuantity(cartId, prodId, userId, count) {
+    let quantity = parseInt(document.getElementById(prodId).textContent);
     count = parseInt(count);
 
     $.ajax({
       url: "/change_product_quantity",
+      method: "PUT",
       data: {
+        user: userId,
         cart: cartId,
         product: prodId,
         count: count,
+        quantity: quantity,
       },
-      method: "post",
       success: (response) => {
-        alert(response);
+        if (response.removeProduct) {
+          alert("Product removed");
+          location.reload();
+        } else {
+          let cartQuantity = quantity + count;
+          document.getElementById(prodId).innerHTML = cartQuantity;
+          document.getElementById("total").innerHTML = response.total;
+          document.getElementById("subtotal").innerHTML = response.total;
+        }
+      },
+    });
+  }
+  function removeItem(cartId, prodId) {
+    $.ajax({
+      url: "/delete_cart_item",
+      data: {
+        cartId: cartId,
+        product: prodId,
+      },
+      method: "DELETE",
+      success: (response) => {
+        if (response.removeProduct) {
+          location.reload();
+        }
       },
     });
   }

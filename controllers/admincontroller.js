@@ -21,7 +21,6 @@ module.exports = {
       req.body.email == adminCredential.email &&
       req.body.password == adminCredential.password
     ) {
-      console.log("passwordcorrect");
       (req.session.admin = adminCredential), (req.session.adminloggedIn = true);
       adminloginErr = false;
       adminStatus = req.session.adminloggedIn;
@@ -153,8 +152,6 @@ module.exports = {
       var procategory = response;
       adminHelper.editProduct(req.params.id).then((response) => {
         editproduct = response;
-        console.log(editproduct);
-        console.log(procategory);
         res.render("admin/edit-product", {
           layout: "adminLayout",
           adminStatus,

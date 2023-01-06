@@ -2,11 +2,12 @@ const userhelpers = require("../helpers/userhelpers");
 const user = require("../models/connection");
 const otp = require("../otp/otp");
 const ObjectId = require("mongodb").ObjectId;
+const adminHelper = require("../helpers/adminHelpers");
 
 const client = require("twilio")(otp.accountId, otp.authToken);
 
-let userSession, number, loggedUser;
-let count;
+let userSession, number, loggedUser, loggedUserId;
+let count, otpNumber;
 
 module.exports = {
   getHome: async (req, res) => {
@@ -29,14 +30,10 @@ module.exports = {
     res.render("user/otplogin", { userSession });
   },
   postUserOtpLogin: async (req, res) => {
-    console.log(req.body.number);
-
     number = req.body.number;
     let users = await user.user.find({ phonenumber: number }).exec();
     loggedUser = users;
-    console.log(users);
     if (users == false) {
-      console.log("falsehi");
       res.redirect("/login");
     } else {
       client.verify.v2
@@ -61,14 +58,20 @@ module.exports = {
       .verificationChecks.create({ to: `+91 ${number}`, code: otpNumber })
       .then((verification_check) => {
         if (verification_check.valid == true) {
-          req.session.user = loggedUser.username;
+          let id = loggedUser[0]._id;
+          req.session.user = { loggedUser, id };
+
           req.session.userLoggedIn = true;
           userSession = req.session.userLoggedIn;
 
+          //new
+
+          // userhelpers.getUserDetailsNo(number).then((user) => {
+          //   req.session.user = user[0]._id;
+          //   userSession = req.session.user;
+          // });
           res.render("user/user", { userSession });
         } else {
-          console.log("otpnothi");
-
           res.redirect("/otp_verify");
         }
       });
@@ -81,16 +84,12 @@ module.exports = {
     userhelpers.doLogin(req.body).then((response) => {
       let loggedInStatus = response.loggedInStatus;
       let blockedStatus = response.blockedStatus;
-      console.log(loggedInStatus);
       if (loggedInStatus == true) {
         req.session.user = response;
         req.session.userLoggedIn = true;
         userSession = req.session.userLoggedIn;
         res.redirect("/");
       } else {
-        console.log(loggedInStatus);
-        console.log(blockedStatus);
-
         blockedStatus;
         res.render("user/login", { loggedInStatus, blockedStatus });
       }
@@ -111,26 +110,24 @@ module.exports = {
   },
   getShop: async (req, res) => {
     count = await userhelpers.getCartItemsCount(req.session.user.id);
+    viewCategory = await adminHelper.viewAddCategory();
+
     userhelpers.shopListProduct().then((response) => {
       // console.log(response);
-      res.render("user/shop", { response, userSession, count });
+      res.render("user/shop", { response, userSession, count, viewCategory });
     });
   },
 
   getProductDetails: async (req, res) => {
     count = await userhelpers.getCartItemsCount(req.session.user.id);
 
-    console.log(req.params.id);
     userhelpers.productDetails(req.params.id).then((data) => {
       console.log(data);
-      res.render("user/eachproduct", { data, count });
+      res.render("user/eachproduct", { userSession, data, count });
     });
   },
 
   getAddToCart: (req, res) => {
-    console.log(req.params.id);
-    console.log(req.session.user.id);
-
     userhelpers.addToCart(req.params.id, req.session.user.id).then((data) => {
       console.log(data);
       res.json({ status: true });
@@ -138,16 +135,37 @@ module.exports = {
   },
 
   getViewCart: async (req, res) => {
+    console.log(req);
+    let userId = req.session.user;
+    let total = await userhelpers.totalCheckOutAmount(req.session.user.id);
     let count = await userhelpers.getCartItemsCount(req.session.user.id);
 
     let cartItems = await userhelpers.viewCart(req.session.user.id);
+    // console.log(cartItems);
 
-    res.render("user/view-cart", { cartItems, userSession, count });
+    res.render("user/view-cart", {
+      cartItems,
+      userId,
+      userSession,
+      count,
+      total,
+    });
   },
   postchangeProductQuantity: async (req, res) => {
-    let count = await userhelpers.getCartItemsCount(req.session.user.id);
-    await userhelpers.changeProductQuantity(req.body).then((data) => {});
+    await userhelpers.changeProductQuantity(req.body).then(async (response) => {
+      response.total = await userhelpers.totalCheckOutAmount(req.body.user);
+
+      res.json(response);
+    });
   },
+
+  getDeleteCart: (req, res) => {
+    console.log(req.body);
+    userhelpers.deleteCart(req.body).then((response) => {
+      res.json(response);
+    });
+  },
+  getProceedToCheckOut: (req, res) => {},
 
   getLogout: (req, res) => {
     req.session.user = null;
@@ -155,12 +173,4 @@ module.exports = {
 
     res.redirect("/login");
   },
-
-  // shopProduct:(req,res)=>{
-  //   userhelpers.shopListProduct().then((response)=>{
-  //     console.log(response);
-  //     res.render('user/shop',{response})
-  //   })
-
-  // },
 };

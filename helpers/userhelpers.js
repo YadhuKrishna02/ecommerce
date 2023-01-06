@@ -88,23 +88,17 @@ module.exports = {
     });
   },
   addToCart: (proId, userId) => {
-    console.log(proId);
-    console.log(userId);
     proObj = {
       productId: proId,
       Quantity: 1,
     };
     return new Promise(async (resolve, reject) => {
-      console.log("kri");
       let carts = await user.cart.findOne({ user: userId });
       if (carts) {
-        console.log("cart already exist");
-
         let productExist = carts.cartItems.findIndex(
           (cartItems) => cartItems.productId == proId
         );
         // console.log(cartItems);
-        console.log(productExist);
         if (productExist != -1) {
           user.cart
             .updateOne(
@@ -117,7 +111,6 @@ module.exports = {
               resolve();
             });
         } else {
-          console.log("elsehi");
           await user.cart
             .updateOne(
               { user: userId },
@@ -128,14 +121,10 @@ module.exports = {
               }
             )
             .then((response) => {
-              console.log(proId);
-              console.log(response);
-
               resolve(response);
             });
         }
       } else {
-        console.log("else keri");
         let cartItems = new user.cart({
           user: userId,
 
@@ -151,7 +140,6 @@ module.exports = {
     });
   },
   viewCart: (userId) => {
-    console.log(userId);
     return new Promise(async (resolve, reject) => {
       const id = await user.cart
         .aggregate([
@@ -208,16 +196,91 @@ module.exports = {
   },
   changeProductQuantity: (data) => {
     count = parseInt(data.count);
+    quantity = parseInt(data.quantity);
     return new Promise((resolve, reject) => {
-      db.cart
-        .updateOne(
-          { _id: data.cart, "cartItems.productId": data.cartItems },
+      if (count == -1 && quantity == 1) {
+        user.cart
+          .updateOne(
+            { _id: data.cart },
+            {
+              $pull: { cartItems: { productId: data.product } },
+            }
+          )
+          .then(() => {
+            resolve({ removeProduct: true });
+          });
+      } else {
+        user.cart
+          .updateOne(
+            { _id: data.cart, "cartItems.productId": data.product },
+            {
+              $inc: { "cartItems.$.Quantity": count },
+            }
+          )
+          .then(() => {
+            resolve({ status: true });
+          });
+      }
+    });
+  },
+  totalCheckOutAmount: (userId) => {
+    return new Promise(async (resolve, reject) => {
+      const id = await user.cart
+        .aggregate([
           {
-            $inc: { "cartItems.$.quantity": count },
+            $match: {
+              user: ObjectId(userId),
+            },
+          },
+          {
+            $unwind: "$cartItems",
+          },
+
+          {
+            $project: {
+              item: "$cartItems.productId",
+              quantity: "$cartItems.Quantity",
+            },
+          },
+
+          {
+            $lookup: {
+              from: "products",
+              localField: "item",
+              foreignField: "_id",
+              as: "carted",
+            },
+          },
+          {
+            $project: {
+              item: 1,
+              quantity: 1,
+              product: { $arrayElemAt: ["$carted", 0] },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              total: { $sum: { $multiply: ["$quantity", "$product.Price"] } },
+            },
+          },
+        ])
+        .then((total) => {
+          resolve(total[0]?.total);
+        });
+    });
+  },
+  deleteCart: (data) => {
+    return new Promise((resolve, reject) => {
+      user.cart
+        .updateOne(
+          { _id: data.cartId },
+          {
+            $pull: { cartItems: { productId: data.product } },
           }
         )
         .then(() => {
-          resolve({ status: "success" });
+          resolve({ removeProduct: true });
         });
     });
   },

@@ -41,6 +41,22 @@ router.get(
 
 router.get("/view_cart", middleware.userSession, controllers.getViewCart);
 
-router.post("/change_product_quantity", controllers.postchangeProductQuantity);
+router.put(
+  "/change_product_quantity",
+  middleware.userSession,
+  controllers.postchangeProductQuantity
+);
+
+router.delete(
+  "/delete_cart_item",
+  middleware.userSession,
+  controllers.getDeleteCart
+);
+
+router.get(
+  "/checkout",
+  middleware.userSession,
+  controllers.getProceedToCheckOut
+);
 
 module.exports = router;
