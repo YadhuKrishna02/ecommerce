@@ -1,4 +1,5 @@
 const userhelpers = require("../helpers/userhelpers");
+const couponHelpers = require("../helpers/couponHelpers");
 const user = require("../models/connection");
 const otp = require("../otp/otp");
 const ObjectId = require("mongodb").ObjectId;
@@ -6,8 +7,10 @@ const adminHelper = require("../helpers/adminHelpers");
 
 const client = require("twilio")(otp.accountId, otp.authToken);
 
-let userSession, number, loggedUser, loggedUserId;
-let count, otpNumber;
+let userSession, number, loggedUser;
+let count,
+  otpNumber,
+  couponPrice = 0;
 
 module.exports = {
   getHome: async (req, res) => {
@@ -109,6 +112,8 @@ module.exports = {
     });
   },
   getShop: async (req, res) => {
+    console.log(req.session.user.id);
+
     count = await userhelpers.getCartItemsCount(req.session.user.id);
     viewCategory = await adminHelper.viewAddCategory();
 
@@ -172,5 +177,41 @@ module.exports = {
     req.session.userLoggedIn = false;
 
     res.redirect("/login");
+  },
+
+  checkOut: async (req, res) => {
+    count = await userhelpers.getCartItemsCount(req.session.user.id);
+
+    res.render("user/checkout", { userSession, count });
+  },
+  //************************************************************ */
+  //**********COUPON STARTS HERE************** */
+  //************************************************************ */
+
+  applyCoupon: async (req, res) => {
+    let code = req.query.code;
+    console.log(code);
+    let total = await userhelpers.totalCheckOutAmount(req.session.user);
+    couponHelpers.applyCoupon(code, total).then((response) => {
+      couponPrice = response.discountAmount ? response.discountAmount : 0;
+      res.json(response);
+    });
+  },
+  couponValidator: async (req, res) => {
+    let code = req.query.code;
+    couponHelpers
+      .couponValidator(code, req.session.user.id)
+      .then((response) => {
+        console.log(response);
+        res.json(response);
+      });
+  },
+  couponVerify: async (req, res) => {
+    let code = req.query.code;
+    couponHelpers.couponVerify(code, req.session.user.id).then((response) => {
+      console.log(response + "___________________________________");
+
+      res.json(response);
+    });
   },
 };

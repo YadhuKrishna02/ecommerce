@@ -53,10 +53,20 @@ router.delete(
   controllers.getDeleteCart
 );
 
+// router.get("/checkout", middleware.userSession, controllers.checkOut);
+
+//************************************************************ */
+//**********COUPON STARTS HERE************** */
+//************************************************************ */
+
+router.get("/apply_coupon", middleware.userSession, controllers.applyCoupon);
+
 router.get(
-  "/checkout",
+  "/coupon_validator/:code",
   middleware.userSession,
-  controllers.getProceedToCheckOut
+  controllers.couponValidator
 );
+
+router.get("/coupon_verify", middleware.userSession, controllers.couponVerify);
 
 module.exports = router;

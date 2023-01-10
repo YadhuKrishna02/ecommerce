@@ -1,6 +1,6 @@
 const { response } = require("express");
 const user = require("../models/connection");
-
+let prodActive;
 module.exports = {
   getUsers: () => {
     console.log(user);
@@ -149,13 +149,13 @@ module.exports = {
         });
     });
   },
-  deleteViewProduct: (productId) => {
-    return new Promise(async (resolve, reject) => {
-      await user.product.deleteOne({ _id: productId }).then((response) => {
-        resolve(response);
-      });
-    });
-  },
+  // deleteViewProduct: (productId) => {
+  //   return new Promise(async (resolve, reject) => {
+  //     await user.product.deleteOne({ _id: productId }).then((response) => {
+  //       resolve(response);
+  //     });
+  //   });
+  // },
   editProduct: (productId) => {
     return new Promise(async (resolve, reject) => {
       await user.product
@@ -185,6 +185,28 @@ module.exports = {
         )
         .then((response) => {
           resolve(response);
+        });
+    });
+  },
+
+  unlistProduct: (prodId) => {
+    return new Promise(async (resolve, reject) => {
+      let checkProd = await user.product
+        .updateOne({ _id: prodId }, { $set: { productActive: false } })
+        .then(() => {
+          // prodActive = data[0];
+          resolve();
+        });
+    });
+  },
+  listProduct: (prodId) => {
+    return new Promise(async (resolve, reject) => {
+      let checkProd = await user.product
+        .updateOne({ _id: prodId }, { $set: { productActive: true } })
+        .then(() => {
+          // console.log(data + "i am in list");
+          // prodActive = data[0];
+          resolve();
         });
     });
   },

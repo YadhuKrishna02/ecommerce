@@ -1,0 +1,204 @@
+<style>
+  @import "compass/css3";
+
+  .dl-small {
+    margin-bottom: 4px;
+  }
+
+  body {
+    margin: 0 auto;
+    padding: 1em;
+  }
+
+  .form-control {
+    width: auto;
+  }
+
+  .form-control-small {
+    width: 100px;
+  }
+
+  .form-control-large {
+    width: 310px;
+  }
+</style>
+<section class="container-fluid" style="max-width: 800px">
+  <div>
+    <div class="page-header" style="margin: 3rem 0">
+      <h1>Checkout Details</h1>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+        <h3 style="margin-bottom: 2rem">Ship my order to</h3>
+        <div class="list-group">
+          <div class="list-group-item">
+            <div class="list-group-item-heading">
+              <div class="row radio">
+                <div class="col-xs-3">
+                  <label>
+                    <input
+                      type="radio"
+                      name="optionShipp"
+                      id="optionShipp1"
+                      value="option2"
+                      style="height: 1.2rem; width: 1.2rem"
+                    />
+                    1509 Latona St
+                  </label>
+                </div>
+                <div class="col-xs-5">
+                  <dl class="dl-small">
+                    <dt>Miguel Perez</dt>
+                    <dd>1509 Latona St, Philadelphia, PA 19146</dd>
+                  </dl>
+                  <button class="btn btn-sm">Edit</button>
+                  <button class="btn btn-sm btn-link">
+                    Delete this address
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="list-group-item" style="margin: 3rem">
+            <div class="list-group-item-heading">
+              <div class="row">
+                <div class="col-xs-3">
+                  <div class="radio">
+                    <label>
+                      <input
+                        type="radio"
+                        name="optionShipp"
+                        id="optionShipp2"
+                        value="option2"
+                        checked
+                        style="height: 1.2rem; width: 1.2rem"
+                      />
+                      A new address
+                    </label>
+                  </div>
+                </div>
+                <div class="col-xs-9">
+                  <form role="form" class="">
+                    <div class="form-group">
+                      <label for="inputname">Name</label>
+                      <input
+                        type="text"
+                        class="form-control form-control-large"
+                        id="inputname"
+                        placeholder="Enter name"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label for="inputAddress1">Street address 1</label>
+                      <input
+                        type="text"
+                        class="form-control form-control-large"
+                        id="inputAddress1"
+                        placeholder="Enter address"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label for="inputAddress2">Street address 2</label>
+                      <input
+                        type="text"
+                        class="form-control form-control-large"
+                        id="inputAddress2"
+                        placeholder="Enter address"
+                      />
+                    </div>
+                    <div class="row">
+                      <div class="col-xs-3">
+                        <div class="form-group">
+                          <label for="inputZip">ZIP Code</label>
+                          <input
+                            type="text"
+                            class="form-control form-control-small"
+                            id="inputZip"
+                            placeholder="Enter zip"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-xs-9">
+                        <div class="form-group">
+                          <label for="inputCity">City</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="inputCity"
+                            placeholder="Enter city"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="inputState" class="control-label"
+                        >State</label
+                      >
+                      <select class="form-control form-control-large">
+                        <option>Select state</option>
+                      </select>
+                    </div>
+                  </form>
+                  <button class="btn btn-sm">Save Address</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <h3 style="margin: 3rem 0">Payment methods</h3>
+        <div class="list-group">
+          <div class="list-group-item">
+            <div class="list-group-item-heading">
+              <div class="row radio">
+                <div class="col-xs-3">
+                  <label>
+                    <input
+                      type="radio"
+                      name="optionsRadios"
+                      id="optionsRadios2"
+                      value="option2"
+                      style="height: 1.2rem; width: 1.2rem"
+                    />
+                    COD
+                  </label>
+                </div>
+                <div class="col-xs-3">
+                  <label>
+                    <input
+                      type="radio"
+                      name="optionsRadios"
+                      id="optionsRadios2"
+                      value="option2"
+                      style="height: 1.2rem; width: 1.2rem"
+                    />
+                    PayPal
+                  </label>
+                </div>
+                <div class="col-xs-9">
+                  <div class="media">
+                    <a class="media-left" href="#">
+                      <img
+                        src="https://www.paypalobjects.com/webstatic/mktg/logo-center/PP_Acceptance_Marks_for_LogoCenter_76x48.png"
+                        height="25"
+                        alt=""
+                      />
+                    </a>
+                    <div class="media-body">
+                      When you click "Place Order", you will be taken to the
+                      PayPal website.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="well">
+          <button type="button" class="btn btn-primary btn-lg btn-block mt-5">
+            Place Order
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

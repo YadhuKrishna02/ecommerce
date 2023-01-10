@@ -1,5 +1,7 @@
 const adminHelper = require("../helpers/adminHelpers");
+const couponHelpers = require("../helpers/couponHelpers");
 const user = require("../models/connection");
+const swal = require("sweetalert");
 
 const adminCredential = {
   name: "superAdmin",
@@ -29,7 +31,7 @@ module.exports = {
     } else {
       adminloginErr = true;
 
-      res.render("admin/login", {
+      res.render("admin/loginNew", {
         layout: "adminLayout",
         adminloginErr,
         adminStatus,
@@ -70,7 +72,7 @@ module.exports = {
     req.session.adminloggedIn = false;
     adminStatus = false;
 
-    res.render("admin/login", { layout: "adminLayout", adminStatus });
+    res.render("admin/loginNew", { layout: "adminLayout", adminStatus });
   },
   getCategory: (req, res) => {
     adminHelper.viewAddCategory().then((response) => {
@@ -174,9 +176,76 @@ module.exports = {
 
   //delete view product
 
-  deleteViewProduct: (req, res) => {
-    adminHelper.deleteViewProduct(req.params.id).then((response) => {
-      res.redirect("/admin/view_product");
+  // deleteViewProduct: (req, res) => {
+  //   adminHelper.deleteViewProduct(req.params.id).then((response) => {
+  //     res.redirect("/admin/view_product");
+  //   });
+  // },
+
+  // List Product
+
+  listProduct: (req, res) => {
+    // console.log(req.params.id + "in list");
+    adminHelper.listProduct(req.params.id).then(() => {
+      res.json({ status: true });
+    });
+  },
+  unlistProduct: (req, res) => {
+    // console.log(req.params.id + "in unlist");
+    adminHelper.unlistProduct(req.params.id).then(() => {
+      res.json({ status: false });
+    });
+  },
+
+  //************************************************************ */
+  //**********COUPON STARTS HERE************** */
+  //************************************************************ */
+
+  addCoupons: (req, res) => {
+    res.render("admin/add-coupons", { layout: "adminLayout", adminStatus });
+  },
+  generateCoupon: (req, res) => {
+    couponHelpers.generateCoupon().then((response) => {
+      res.json(response);
+    });
+  },
+  addNewCoupon: (req, res) => {
+    data = {
+      couponName: req.body.couponName,
+      expiry: req.body.expiry,
+      minPurchase: req.body.minPurchase,
+      description: req.body.description,
+      discountPercentage: req.body.discountPercentage,
+      maxDiscountValue: req.body.maxDiscountValue,
+    };
+    console.log(data);
+    couponHelpers.addNewCoupon(data).then((response) => {
+      res.json(response);
+    });
+  },
+  newCoupons: async (req, res) => {
+    let coupon = await couponHelpers.getCoupons();
+    const getDate = (date) => {
+      let orderDate = new Date(date);
+      let day = orderDate.getDate();
+      let month = orderDate.getMonth() + 1;
+      let year = orderDate.getFullYear();
+      return `${isNaN(day) ? "00" : day}-${isNaN(month) ? "00" : month}-${
+        isNaN(year) ? "0000" : year
+      }`;
+    };
+    console.log(coupon);
+    res.render("admin/coupon", {
+      layout: "adminLayout",
+      coupon,
+      adminStatus,
+      getDate,
+    });
+  },
+  deleteCoupon: (req, res) => {
+    console.log(req.params.id);
+    couponHelpers.deleteCoupon(req.params.id).then((response) => {
+      res.json(response);
     });
   },
 };
