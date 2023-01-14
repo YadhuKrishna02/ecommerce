@@ -141,7 +141,10 @@ const orderSchema = new mongoose.Schema({
           createdAt: {
               type: Date,
               default: new Date()
-          }
+          },
+          orderStatus:{
+            type:String,default:"success"
+        },
       }
   ]
 })

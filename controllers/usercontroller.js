@@ -122,7 +122,7 @@ module.exports = {
   getShop: async (req, res) => {
     let pageNum=req.query.page 
     let currentPage=pageNum
-    let perPage=3
+    let perPage=6
     console.log(req.session.user.id);
 
     count = await userhelpers.getCartItemsCount(req.session.user.id)
@@ -224,9 +224,6 @@ postcheckOutPage:async (req, res) => {
  
     } else {
       userhelpers.generateRazorpay(req.session.user.id, total).then((order) => {
-        console.log(order.id);
- 
-        console.log(order.amount);
         res.json(order)
  
       })
@@ -254,13 +251,50 @@ postcheckOutPage:async (req, res) => {
    
  },
  getOrderPage: (req, res) => {
-   userhelpers.orderPage(req.session.user.id).then((response) => {
+  const getDate = (date) => {
+    let orderDate = new Date(date);
+    let day = orderDate.getDate();
+    let month = orderDate.getMonth() + 1;
+    let year = orderDate.getFullYear();
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+    let seconds = date.getSeconds();
+    return `${isNaN(day) ? "00" : day}-${isNaN(month) ? "00" : month}-${isNaN(year) ? "0000" : year
+      } ${date.getHours(hours)}:${date.getMinutes(minutes)}:${date.getSeconds(seconds)}`;
+  };
+  userhelpers.orderPage(req.session.user.id).then((response) => {
+
+    res.render('user/orderslist', { response, userSession, count, getDate })
+  })
+
+},
  
-     res.render('user/orderslist',{response,userSession})
-   })
- 
- },
- 
+orderDetails: async (req, res) => {
+
+  let details = req.query.order
+  const getDate = (date) => {
+    let orderDate = new Date(date);
+    let day = orderDate.getDate();
+    let month = orderDate.getMonth() + 1;
+    let year = orderDate.getFullYear();
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+    let seconds = date.getSeconds();
+    return `${isNaN(day) ? "00" : day}-${isNaN(month) ? "00" : month}-${isNaN(year) ? "0000" : year
+      } ${date.getHours(hours)}:${date.getMinutes(minutes)}:${date.getSeconds(seconds)}`;
+  };
+
+  userhelpers.viewOrderDetails(details).then((response) => {
+    console.log(response.products);
+    let products = response.products[0]
+    let address = response.address
+    let orderDetails = response.details
+
+    res.render('user/order-details', { products, address, orderDetails, userSession, count, getDate })
+
+  })
+
+},
  
  
  getAddresspage: async (req, res) => {
@@ -284,15 +318,15 @@ postcheckOutPage:async (req, res) => {
    })
  
  },
- getCancelOrder:(req, res)=>
-  {
-    
-    userhelpers.cancelOrder(req.params.orderId, req.session.user.id).then((response)=>
-    {
-      res.json(response)
-    })
+ getCancelOrder: (req, res) => {
+  console.log('--------', req.query.orderid);
 
-  },
+  userhelpers.cancelOrder(req.query.orderid, req.session.user.id).then((response) => {
+    console.log('++++++++', response);
+    res.json(response)
+  })
+
+},
 
   category: async(req, res) => {
     viewCategory = await adminHelper.viewAddCategory()
@@ -344,4 +378,8 @@ postcheckOutPage:async (req, res) => {
     search=search.slice(0,10);
     res.send({payload:search})
   },
+
+  getSuccessPage:(req,res)=>{
+    res.render('user/success')
+  }
 };

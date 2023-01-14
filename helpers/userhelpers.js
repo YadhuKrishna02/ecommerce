@@ -32,13 +32,11 @@ module.exports = {
             email: userData.email,
             phonenumber: userData.phonenumber,
           });
-          console.log(data);
           await data.save(data).then((data) => {
             resolve({ data, emailStatus: false });
           });
         }
       } catch (err) {
-        console.log(err);
       }
     });
   },
@@ -68,7 +66,6 @@ module.exports = {
           resolve({ loggedInStatus: false });
         }
       } catch (err) {
-        console.log(err);
       }
     });
   },
@@ -81,19 +78,16 @@ module.exports = {
     })},
 
   shopListProduct: (pageNum) => {
-    console.log("hi");
      
-     let perPage=3
+     let perPage=6
      return new Promise(async (resolve, reject) => {
       
        
          
         await user.product.find().skip((pageNum-1)*perPage).limit(perPage).then((response)=>{
-         console.log(response);
          
            resolve(response)
          })
-         // console.log(response)
          
        
      })
@@ -101,7 +95,6 @@ module.exports = {
   productDetails: (proId) => {
     return new Promise(async (resolve, reject) => {
       await user.product.find({ _id: proId }).then((response) => {
-        // console.log(response);
         resolve(response);
       });
     });
@@ -117,7 +110,6 @@ module.exports = {
         let productExist = carts.cartItems.findIndex(
           (cartItems) => cartItems.productId == proId
         );
-        // console.log(cartItems);
         if (productExist != -1) {
           user.cart
             .updateOne(
@@ -149,9 +141,7 @@ module.exports = {
 
           cartItems: proObj,
         });
-        console.log(cartItems + "proid");
         await cartItems.save().then((data) => {
-          console.log(data);
 
           resolve(data);
         });
@@ -195,7 +185,6 @@ module.exports = {
           },
         ])
         .then((cartItems) => {
-          console.log(cartItems);
 
           resolve(cartItems);
         });
@@ -205,12 +194,10 @@ module.exports = {
     return new Promise(async (resolve, reject) => {
       let count = 0;
       let cart = await user.cart.findOne({ user: userId });
-      console.log(cart);
       if (cart) {
         count = cart.cartItems.length;
       }
       resolve(count);
-      console.log(count);
     });
   },
   changeProductQuantity: (data) => {
@@ -328,7 +315,6 @@ module.exports = {
       
           ]).then((result)=>
           {
-            console.log(result);
             resolve(result)
           })
          
@@ -341,7 +327,6 @@ module.exports = {
   category:(categoryName)=>{
     return new Promise(async (resolve, reject) => {
       await user.product.find({category:categoryName}).then((response)=>{
-        console.log(response);
         resolve(response)
       })
     })
@@ -418,6 +403,8 @@ module.exports = {
         },
         {
           $project: {
+            image: '$productdetails.Image',
+            category: '$productdetails.category',
             _id: "$productdetails._id",
             quantity: 1,
             productsName: "$productdetails.Productname",
@@ -503,12 +490,9 @@ module.exports = {
     return new Promise(async (resolve, reject) => {
 
       let orders = await user.order.find({ userid: userId })
-      console.log("before" + orders);
       let order = orders[0].orders.slice().reverse()
-      console.log(order);
       let orderId = order[0]._id
       total = total * 100
-      console.log(total);
       var options = {
         amount: parseInt(total),
         currency: "INR",
@@ -516,13 +500,8 @@ module.exports = {
       }  
       instance.orders.create(options, function (err, order) {
         if (err) {
-          console.log(err);
         } else {
-          // console.log('new order:',order);
-
-
           resolve(order)
-          //  console.log(order);
         }
       })
 
@@ -531,7 +510,6 @@ module.exports = {
   verifyPayment: (details) => {
     return new Promise((resolve, reject) => {
       try {
-        console.log('hlo');
         const crypto = require('crypto')
         let hmac = crypto.createHmac('sha256', razorpay.secret_id)
         hmac.update(details['payment[razorpay_order_id]'] + "|" + details['payment[razorpay_payment_id]'])
@@ -542,7 +520,6 @@ module.exports = {
           reject("not match")
         }
       } catch (err) {
-        console.log(err)
       }
     })
 
@@ -550,14 +527,11 @@ module.exports = {
 
   },
   changePaymentStatus: (userId, orderId) => {
-    console.log('orderId=>', orderId);
-    console.log('hi');
     return new Promise(async (resolve, reject) => {
       try {
         let orders = await user.order.find({ userId: userId })
 
         let orderIndex = orders[0].orders.findIndex(order => order._id == orderId)
-        console.log(orderIndex);
         await user.order.updateOne(
           {
             'orders._id': ObjectId(orderId)
@@ -575,13 +549,11 @@ module.exports = {
 
             })
       } catch (err) {
-        console.log(err)
       }
 
     })
   },
   postAddress: (userId, data) => {
-    console.log('hlo');
     return new Promise(async(resolve, reject) => {
 
       let addressInfo = {
@@ -611,7 +583,6 @@ module.exports = {
 
               }
             }).then((response) => {
-              console.log(response);
               resolve(response)
             })
 
@@ -628,7 +599,6 @@ module.exports = {
           })
 
           await addressData.save().then((response) => {
-            console.log(response);
             resolve(response)
           });
         }
@@ -649,43 +619,60 @@ module.exports = {
         $sort: { 'orders:createdAt': -1 }
       }
       ]).then((response) => {
-        console.log(response);
         resolve(response)
       })
     })
 
   },
+  viewOrderDetails: (orderId) => {
+    return new Promise(async (resolve, reject) => {
 
-  cancelOrder:(orderId,userId)=>{
+  let productid = await user.order.findOne({ "orders._id": orderId },{'orders.$':1})
 
-  
-    return new Promise(async(resolve, reject) => {
+   
+   let details=productid.orders[0]
+   let order=productid.orders[0].productDetails
+ 
+   const productDetails = productid.orders.map(object => object.productDetails);
+   const address= productid.orders.map(object => object.shippingAddress);
+   const products = productDetails.map(object => object)
      
-    let orders= await user.order.find({'orders._id':orderId})
-    console.log('match---',orders);
-    
-    console.log(orders[0].orders[0]._id);
-  
-    let orderIndex = orders[0].orders.findIndex(orders => orders._id == orderId)
-    console.log(orderIndex);
-  
-      await user.order.updateOne({ 'orders._id': orderId }  ,
-       {
-        $set:
-        {
-          ['orders.'+orderIndex+'.orderStatus']:'cancelled'
-  
-        }
+        resolve({products,address, details,})
       
-       
-       }).then((orders)=>{
-        console.log(orders);
-           resolve(orders)
-    })
     
+           
     })
-  
-  
+
+
+
+  },
+
+  cancelOrder: (orderId, userId) => {
+
+    return new Promise(async (resolve, reject) => {
+
+      let orders = await user.order.find({ 'orders._id': orderId })
+
+    
+
+      let orderIndex = orders[0].orders.findIndex(orders => orders._id == orderId)
+
+      await user.order.updateOne({ 'orders._id': orderId },
+        {
+          $set:
+          {
+            ['orders.' + orderIndex + '.orderStatus']: 'cancelled'
+
+          }
+
+
+        }).then((orders) => {
+          resolve(orders)
+        })
+
+    })
+
+
   },
 
 

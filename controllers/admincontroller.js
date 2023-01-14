@@ -141,6 +141,9 @@ module.exports = {
     });
   },
   getViewproduct: (req, res) => {
+
+
+    
     adminHelper.ViewProduct().then((response) => {
       res.render("admin/view-product", {
         layout: "adminLayout",
