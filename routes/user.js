@@ -1,3 +1,4 @@
+const { application } = require("express");
 var express = require("express");
 var router = express.Router();
 const controllers = require("../controllers/usercontroller");
@@ -25,7 +26,6 @@ router.get("/shop", middleware.userSession, controllers.getShop);
 
 router.get("/logout", middleware.userSession, controllers.getLogout);
 
-router.get("/shop", middleware.userSession, controllers.getShop);
 
 router.get(
   "/product_details/:id",
@@ -53,7 +53,20 @@ router.delete(
   controllers.getDeleteCart
 );
 
-// router.get("/checkout", middleware.userSession, controllers.checkOut);
+
+router.get("/check_out", middleware.userSession, controllers.checkOutPage);
+
+router.post("/check_out",middleware.userSession,controllers.postcheckOutPage)
+
+router.post('/verify_payment',middleware.userSession,controllers.postVerifyPayment)
+
+router.get('/order',middleware.userSession,controllers.getOrderPage)
+
+router.get('/cancel_order/:orderId',middleware.userSession,controllers.getCancelOrder)
+
+router.get("/add_address",middleware.userSession,controllers.getAddresspage)
+
+router.post('/add_address',middleware.userSession,controllers.postAddresspage)
 
 //************************************************************ */
 //**********COUPON STARTS HERE************** */
@@ -62,11 +75,20 @@ router.delete(
 router.get("/apply_coupon", middleware.userSession, controllers.applyCoupon);
 
 router.get(
-  "/coupon_validator/:code",
+  "/coupon_validator",
   middleware.userSession,
   controllers.couponValidator
 );
 
 router.get("/coupon_verify", middleware.userSession, controllers.couponVerify);
+
+
+//************************************************************ */
+//**********SEARCH PRODUCT***************/
+//************************************************************ */
+
+router.post('/search_product',middleware.userSession, controllers.searchProduct)
+
+router.get('/category', middleware.userSession, controllers.category)
 
 module.exports = router;

@@ -4,6 +4,12 @@ const { response } = require("../app");
 const ObjectId = require("mongodb").ObjectId;
 
 const otp = require("../otp/otp");
+const Razorpay = require('razorpay');
+const razorpay = require('../otp/razorpay')
+var instance = new Razorpay({
+  key_id: 'rzp_test_PhFuqLgHsH5Ajz',
+  key_secret: 'UXvzfAkrkdiOg59z8kkBDaUJ',
+});
 
 const client = require("twilio")(otp.accountId, otp.authToken);
 
@@ -66,19 +72,32 @@ module.exports = {
       }
     });
   },
+  documentCount:()=>{
+    return new Promise(async(resolve, reject) => {
+      await user.product.find().countDocuments().then((documents) => {
+        
+        resolve(documents);
+    })
+    })},
 
-  shopListProduct: () => {
+  shopListProduct: (pageNum) => {
     console.log("hi");
-    return new Promise(async (resolve, reject) => {
-      await user.product
-        .find()
-        .exec()
-        .then((response) => {
-          // console.log(response)
-          resolve(response);
-        });
-    });
-  },
+     
+     let perPage=3
+     return new Promise(async (resolve, reject) => {
+      
+       
+         
+        await user.product.find().skip((pageNum-1)*perPage).limit(perPage).then((response)=>{
+         console.log(response);
+         
+           resolve(response)
+         })
+         // console.log(response)
+         
+       
+     })
+   },
   productDetails: (proId) => {
     return new Promise(async (resolve, reject) => {
       await user.product.find({ _id: proId }).then((response) => {
@@ -284,4 +303,400 @@ module.exports = {
         });
     });
   },
+
+  getCardProdctList:(userId)=>{
+    return new Promise(async(resolve, reject) => {
+     
+      
+          let id = user.cart.aggregate([
+      
+            {
+              $match: {
+                user:ObjectId(userId)
+              }
+            },
+            {
+             $unwind: '$cartItems'
+            },
+                
+          {
+              $project: {
+                  item: '$cartItems.productId',
+                _id:0
+              }
+          },
+      
+          ]).then((result)=>
+          {
+            console.log(result);
+            resolve(result)
+          })
+         
+        })
+      
+    
+  
+
+  },
+  category:(categoryName)=>{
+    return new Promise(async (resolve, reject) => {
+      await user.product.find({category:categoryName}).then((response)=>{
+        console.log(response);
+        resolve(response)
+      })
+    })
+
+  },
+  checkOutpage: (userId) => {
+    return new Promise(async (resolve, reject) => {
+
+      await user.address.aggregate([
+        {
+          $match: {
+            userid: ObjectId(userId)
+          }
+        },
+        {
+          $unwind: '$Address'
+        },
+
+        {
+          $project: {
+            item: '$Address'
+
+          }
+        },
+
+        {
+          $project: {
+            item: 1,
+            Address: { $arrayElemAt: ['$Address', 0] }
+          }
+        }
+
+      ]).then((address) => {
+
+
+        resolve(address)
+      })
+
+
+    })
+  },
+  placeOrder: (orderData, total) => {
+    return new Promise(async (resolve, reject) => {
+
+      let productdetails = await user.cart.aggregate([
+        {
+          $match: {
+            user: ObjectId(orderData.user)
+          }
+        },
+        {
+          $unwind: '$cartItems'
+        },
+
+
+        {
+          $project: {
+            item: '$cartItems.productId',
+            quantity: '$cartItems.Quantity',
+
+          }
+        },
+
+        {
+          $lookup: {
+            from: 'products',
+            localField: "item",
+            foreignField: "_id",
+            as: 'productdetails'
+          }
+        },
+        {
+          $unwind: '$productdetails'
+        },
+        {
+          $project: {
+            _id: "$productdetails._id",
+            quantity: 1,
+            productsName: "$productdetails.Productname",
+            productsPrice: "$productdetails.Price",
+
+          }
+        }
+      ])
+   
+   let address= await user.address.aggregate([
+        {
+          $match: {
+            userid: ObjectId(orderData.user)
+          }
+        },
+        {
+          $unwind: '$Address'
+        },
+
+        {
+          $project: {
+            item: '$Address'
+
+          }
+        },
+
+        {
+          $project: {
+            item: 1,
+            }
+          },
+         
+
+      ])
+      
+      orderaddress=address[0].item;
+    
+      let status = orderData['payment-method'] === 'COD' ? 'paid' : 'pending'
+    
+      let orderdata = {
+
+        name:orderaddress.fname,
+        paymentStatus: status,
+        paymentmode:orderData['payment-method'],
+        paymenmethod: orderData['payment-method'],
+        productDetails: productdetails,
+        shippingAddress: orderaddress,
+        totalPrice: total
+      }
+
+
+      let order = await user.order.findOne({ userid: orderData.user })
+
+      if (order) {
+        await user.order.updateOne({ userid: orderData.user },
+          {
+            '$push':
+            {
+              'orders': orderdata
+            }
+          }).then((productdetails) => {
+
+            resolve(productdetails)
+          })
+      } else {
+        let newOrder = user.order({
+          userid: orderData.user,
+          orders: orderdata
+        })
+
+        await newOrder.save().then((orders) => {
+          resolve(orders)
+        })
+      }
+         await  user.cart.deleteMany({ user: orderData.user }).then(()=>{
+          resolve()
+         })
+    
+    })
+  },
+  generateRazorpay: (userId, total) => {
+
+    return new Promise(async (resolve, reject) => {
+
+      let orders = await user.order.find({ userid: userId })
+      console.log("before" + orders);
+      let order = orders[0].orders.slice().reverse()
+      console.log(order);
+      let orderId = order[0]._id
+      total = total * 100
+      console.log(total);
+      var options = {
+        amount: parseInt(total),
+        currency: "INR",
+        receipt: "" + orderId,
+      }  
+      instance.orders.create(options, function (err, order) {
+        if (err) {
+          console.log(err);
+        } else {
+          // console.log('new order:',order);
+
+
+          resolve(order)
+          //  console.log(order);
+        }
+      })
+
+    })
+  },
+  verifyPayment: (details) => {
+    return new Promise((resolve, reject) => {
+      try {
+        console.log('hlo');
+        const crypto = require('crypto')
+        let hmac = crypto.createHmac('sha256', razorpay.secret_id)
+        hmac.update(details['payment[razorpay_order_id]'] + "|" + details['payment[razorpay_payment_id]'])
+        hmac = hmac.digest('hex')
+        if (hmac == details['payment[razorpay_signature]']) {
+          resolve()
+        } else {
+          reject("not match")
+        }
+      } catch (err) {
+        console.log(err)
+      }
+    })
+
+
+
+  },
+  changePaymentStatus: (userId, orderId) => {
+    console.log('orderId=>', orderId);
+    console.log('hi');
+    return new Promise(async (resolve, reject) => {
+      try {
+        let orders = await user.order.find({ userId: userId })
+
+        let orderIndex = orders[0].orders.findIndex(order => order._id == orderId)
+        console.log(orderIndex);
+        await user.order.updateOne(
+          {
+            'orders._id': ObjectId(orderId)
+          },
+          {
+            $set: {
+              ['orders.' + orderIndex + '.paymentStatus']: 'PAID'
+            }
+          }
+        ),
+          await user.cart.deleteMany({ userid: orderId })
+            .then(() => {
+
+              resolve()
+
+            })
+      } catch (err) {
+        console.log(err)
+      }
+
+    })
+  },
+  postAddress: (userId, data) => {
+    console.log('hlo');
+    return new Promise(async(resolve, reject) => {
+
+      let addressInfo = {
+        fname: data.fname,
+        lname: data.lname,
+        street: data.street,
+        apartment: data.apartment,
+        city: data.city,
+        state: data.state,
+        pincode: data.pincode,
+        mobile: data.mobile,
+        email: data.email,
+
+      }
+   
+
+
+        let AddressInfo = await user.address.findOne({ userid: userId })
+        if (AddressInfo) {
+
+
+          await user.address.updateOne({ userid: userId },
+            {
+              "$push":
+              {
+                "Address": addressInfo
+
+              }
+            }).then((response) => {
+              console.log(response);
+              resolve(response)
+            })
+
+
+
+        } else {
+
+
+          let addressData = new user.address({
+            userid: userId,
+
+            Address: addressInfo
+
+          })
+
+          await addressData.save().then((response) => {
+            console.log(response);
+            resolve(response)
+          });
+        }
+      })
+   
+  },
+  orderPage: (userId) => {
+    return new Promise(async (resolve, reject) => {
+
+      await user.order.aggregate([{
+        $match:
+          { userid: ObjectId(userId) }
+      },
+      {
+        $unwind: '$orders'
+      },
+      {
+        $sort: { 'orders:createdAt': -1 }
+      }
+      ]).then((response) => {
+        console.log(response);
+        resolve(response)
+      })
+    })
+
+  },
+
+  cancelOrder:(orderId,userId)=>{
+
+  
+    return new Promise(async(resolve, reject) => {
+     
+    let orders= await user.order.find({'orders._id':orderId})
+    console.log('match---',orders);
+    
+    console.log(orders[0].orders[0]._id);
+  
+    let orderIndex = orders[0].orders.findIndex(orders => orders._id == orderId)
+    console.log(orderIndex);
+  
+      await user.order.updateOne({ 'orders._id': orderId }  ,
+       {
+        $set:
+        {
+          ['orders.'+orderIndex+'.orderStatus']:'cancelled'
+  
+        }
+      
+       
+       }).then((orders)=>{
+        console.log(orders);
+           resolve(orders)
+    })
+    
+    })
+  
+  
+  },
+
+
+  searchProduct:(product)=>{
+    return new Promise(async(resolve, reject) => {
+    
+  
+
+    resolve(search)
+      
+    })
+  }
+
 };

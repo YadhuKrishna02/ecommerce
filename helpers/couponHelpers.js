@@ -45,13 +45,11 @@ module.exports = {
       try {
         let coupon = await db.coupon.findOne({ couponName: code });
         if (coupon) {
-          console.log("vava");
           //checking coupon Valid
 
           if (new Date(coupon.expiry) - new Date() > 0) {
             //checkingExpiry
             if (total >= coupon.minPurchase) {
-              console.log("shammi");
               //checking max offer value
               let discountAmount = (total * coupon.discountPercentage) / 100;
               if (discountAmount > coupon.maxDiscountValue) {

@@ -152,7 +152,7 @@
                     </tbody>
                   </table>
                 </div>
-                <a href="/checkout" class="btn">
+                <a href="/check_out" class="btn">
                   <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a
                 >
               </div>
@@ -215,25 +215,20 @@
       url: "/coupon_validator?code=" + code,
       method: "get",
       success: (response) => {
-        console.log(response + "coupon validated");
-
-        console.log(response);
+        
         if (response.status == true) {
           $.ajax({
             url: "/coupon_verify?code=" + code,
             method: "get",
             success: (response) => {
-              console.log(response + "coupon verified");
               if (response.status == true) {
                 $.ajax({
                   url: "/apply_coupon?code=" + code,
                   method: "get",
                   success: (response) => {
-                    console.log(response.discountAmount + "i am discount");
-                    console.log(response.status + "i am status");
+                   
 
                     if (response.status == true) {
-                      console.log("success3", response);
                       document.querySelector(".couponErr").style.color =
                         "#19ff11";
                       document.querySelector(".couponErr").innerHTML =
@@ -243,7 +238,6 @@
                       // couponTotal.innerHTML = `₹ ${
                       //   total - response.discountAmount
                     } else {
-                      console.log("failed", response);
                       document.querySelector(".couponErr").style.color =
                         "#ff0707";
                       document.querySelector(".couponErr").innerHTML =
@@ -268,9 +262,9 @@
           document.querySelector(".couponErr").innerHTML = response.reason;
           console.log("failed", response.reason);
 
-          setTimeout(function () {
-            document.querySelector(".couponErr").style.display = "none";
-          }, 3000);
+          // setTimeout(function () {
+          //   document.querySelector(".couponErr").style.display = "none";
+          // }, 3000);
         }
       },
     });

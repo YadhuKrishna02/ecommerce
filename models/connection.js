@@ -41,6 +41,12 @@ const userschema = new mongoose.Schema({
   },
 });
 
+const otpSchema = new mongoose.Schema({
+  otp: { type: String, required: true },
+  phoneNumber: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now }
+}); 
+
 const categorySchema = new mongoose.Schema({
   categoryName: {
     type: String,
@@ -87,6 +93,59 @@ const cartSchema = new mongoose.Schema({
   ],
 });
 
+
+const addressSchema=new  mongoose.Schema({
+
+    
+  userid:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref: 'user'
+  },
+  Address:[
+    {
+      fname:{type:String},
+      lname:{type:String},
+      street:{type:String},
+      apartment:{type:String},
+      city:{type:String},
+      state:{type:String},
+      pincode:{type:Number},
+      mobile:{type:Number},
+      email:{type:String}
+    }
+  ]
+
+
+})
+const orderSchema = new mongoose.Schema({
+
+  userid:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref: 'user'
+  },
+  orders: [{
+  
+      
+          name:String,
+          productDetails:Array,
+          paymentMethod: String,
+          paymentStatus: String,
+          totalPrice: Number,
+          totalQuantity: Number,
+          shippingAddress: Object,
+          paymentmode:String,
+          status: {
+              type: Boolean,
+              default: true
+          },
+          createdAt: {
+              type: Date,
+              default: new Date()
+          }
+      }
+  ]
+})
+
 //coupons
 const couponSchema = new mongoose.Schema({
   couponName: String,
@@ -111,5 +170,8 @@ module.exports = {
   categories: mongoose.model("categories", categorySchema),
   product: mongoose.model("product", productSchema),
   cart: mongoose.model("cart", cartSchema),
+  order:mongoose.model('order',orderSchema),
+  address:mongoose.model('address',addressSchema),
   coupon: mongoose.model("coupon", couponSchema),
+  otp:mongoose.model("otp",otpSchema)
 };

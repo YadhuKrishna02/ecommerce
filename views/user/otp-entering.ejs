@@ -33,8 +33,10 @@
                           name="login"
                           style="width: 100%"
                         >
-                          Submit
+                          Submit 
                         </button>
+                        <p class="btn" id="resend-otp-btn">Resend OTP<p/>
+                        <p id="countdown"></p>
                       </div>
                     </form>
                   </div>
@@ -47,3 +49,31 @@
     </section>
   </main>
 </section>
+
+
+<script>
+  let countdown = 60;
+let intervalHandle;
+function startCountdown() {
+    intervalHandle = setInterval(() => {
+        countdown--;
+        document.getElementById('countdown').innerHTML = `Resend OTP in ${countdown} seconds`;
+        if (countdown === 0) {
+            clearInterval(intervalHandle);
+        document.getElementById('countdown').innerHTML ='';
+        countdown=60;
+
+            document.getElementById('resend-otp-btn').disabled = false;
+        }
+    }, 1000);
+}
+window.onload=startCountdown;
+
+// Call the function when the user requests a new OTP
+document.getElementById('resend-otp-btn').addEventListener('click', () => {
+    document.getElementById('resend-otp-btn').disabled = true;
+    document.getElementById('resend-otp-btn').style.backgroundColor = '#fff';
+    document.getElementById('resend-otp-btn').style.color = '#000';
+    startCountdown();
+});
+</script>

@@ -4,6 +4,7 @@ const user = require("../models/connection");
 const otp = require("../otp/otp");
 const ObjectId = require("mongodb").ObjectId;
 const adminHelper = require("../helpers/adminHelpers");
+const { response } = require("../app");
 
 const client = require("twilio")(otp.accountId, otp.authToken);
 
@@ -53,8 +54,15 @@ module.exports = {
     }
   },
 
-  postOtpVerify: (req, res) => {
+  postOtpVerify: async(req, res) => {
     otpNumber = req.body.otp;
+
+    const newOTP = new user.otp({
+      otp: otpNumber,
+      phoneNumber: number
+  });
+
+  await newOTP.save();
 
     client.verify.v2
       .services(otp.serviceId)
@@ -73,7 +81,7 @@ module.exports = {
           //   req.session.user = user[0]._id;
           //   userSession = req.session.user;
           // });
-          res.render("user/user", { userSession });
+          res.render("user/user", { userSession,countdown:60 });
         } else {
           res.redirect("/otp_verify");
         }
@@ -112,17 +120,24 @@ module.exports = {
     });
   },
   getShop: async (req, res) => {
+    let pageNum=req.query.page 
+    let currentPage=pageNum
+    let perPage=3
     console.log(req.session.user.id);
 
-    count = await userhelpers.getCartItemsCount(req.session.user.id);
-    viewCategory = await adminHelper.viewAddCategory();
+    count = await userhelpers.getCartItemsCount(req.session.user.id)
+    viewCategory = await adminHelper.viewAddCategory()
+    documentCount=  await userhelpers.documentCount()
+    let pages=Math.ceil(parseInt(documentCount) /perPage)
 
-    userhelpers.shopListProduct().then((response) => {
-      // console.log(response);
-      res.render("user/shop", { response, userSession, count, viewCategory });
-    });
+    userhelpers.shopListProduct(pageNum).then((response) => {
+      console.log(response);
+      
+      res.render('user/shop', { response, userSession, count, viewCategory ,currentPage,documentCount,pages})
+    })
+
+
   },
-
   getProductDetails: async (req, res) => {
     count = await userhelpers.getCartItemsCount(req.session.user.id);
 
@@ -170,7 +185,7 @@ module.exports = {
       res.json(response);
     });
   },
-  getProceedToCheckOut: (req, res) => {},
+  
 
   getLogout: (req, res) => {
     req.session.user = null;
@@ -179,11 +194,115 @@ module.exports = {
     res.redirect("/login");
   },
 
-  checkOut: async (req, res) => {
-    count = await userhelpers.getCartItemsCount(req.session.user.id);
+  checkOutPage:async (req, res) => {
+    
+    let users = req.session.user.id
+    
+    let count = await userhelpers.getCartItemsCount(req.session.user.id);
+      let cartItems =  await userhelpers.viewCart(req.session.user.id)
+      console.log(cartItems);
+      let total = await userhelpers.totalCheckOutAmount(req.session.user.id)
+      userhelpers.checkOutpage(req.session.user.id).then((response)=>{
+      
 
-    res.render("user/checkout", { userSession, count });
+        res.render('user/checkout',{users,userSession,cartItems,total,response,count})
+  })
+
+},
+
+postcheckOutPage:async (req, res) => {
+
+  
+  let total = await userhelpers.totalCheckOutAmount(req.session.user.id)
+ let order= await userhelpers.placeOrder(req.body, total).then((response) => {
+           
+         
+          
+ 
+    if (req.body['payment-method'] == 'COD') {
+      res.json({ codstatus: true })
+ 
+    } else {
+      userhelpers.generateRazorpay(req.session.user.id, total).then((order) => {
+        console.log(order.id);
+ 
+        console.log(order.amount);
+        res.json(order)
+ 
+      })
+    }
+  })
+ 
+ 
+ },
+ postVerifyPayment: (req, res) => {
+   console.log(req.body);
+   userhelpers.verifyPayment(req.body).then(()=>{
+     console.log(req.body);
+    
+     userhelpers.changePaymentStatus(req.session.user.id,req.body['order[receipt]']).then(()=>{
+ 
+       res.json({status:true})
+ 
+     }).catch((err)=>{
+  console.log(err);
+  res.json({status:false ,err})
+     })
+ 
+   })
+ 
+   
+ },
+ getOrderPage: (req, res) => {
+   userhelpers.orderPage(req.session.user.id).then((response) => {
+ 
+     res.render('user/orderslist',{response,userSession})
+   })
+ 
+ },
+ 
+ 
+ 
+ getAddresspage: async (req, res) => {
+ 
+    
+   console.log(req.session.user.id);
+ 
+   let count = await userhelpers.getCartItemsCount(req.session.user.id);
+ 
+ 
+   res.render('user/add-address',{userSession,count})
+ 
+ },
+ postAddresspage:  (req, res) => {
+          
+     
+   userhelpers.postAddress(req.session.user.id,req.body).then(()=>{
+ 
+   
+     res.redirect('/check_out')
+   })
+ 
+ },
+ getCancelOrder:(req, res)=>
+  {
+    
+    userhelpers.cancelOrder(req.params.orderId, req.session.user.id).then((response)=>
+    {
+      res.json(response)
+    })
+
   },
+
+  category: async(req, res) => {
+    viewCategory = await adminHelper.viewAddCategory()
+
+    userhelpers.category(req.query.cname).then((response)=>{
+      
+      res.render('user/filter-category',{ response, userSession,viewCategory,count})
+    })
+  },
+ 
   //************************************************************ */
   //**********COUPON STARTS HERE************** */
   //************************************************************ */
@@ -213,5 +332,16 @@ module.exports = {
 
       res.json(response);
     });
+  },
+
+  //************************************************************ */
+  //**********SEARCH PRODUCT STARTS HERE************** */
+  //************************************************************ */
+  searchProduct:async(req,res)=>{
+    let payload=req.body.payload.trim();
+    let search=await user.product.find({ Productname: { $regex:new RegExp('^' +payload+'.*','i')} }).exec();
+    
+    search=search.slice(0,10);
+    res.send({payload:search})
   },
 };

@@ -248,4 +248,12 @@ module.exports = {
       res.json(response);
     });
   },
+  getOrderList:(req,res)=>{
+
+    res.render('admin/order-list',{layout:'adminLayout',adminStatus})
+  },
+  getOrderDetails:(req,res)=>{
+    res.render('admin/order-details',{layout:'adminLayout',adminStatus})
+
+  },
 };

@@ -6,7 +6,7 @@ var router = express.Router();
 const user = require("../models/connection");
 const multer = require("../multer/multer");
 const middleware = require("../middlewares/middleware");
-
+                   
 router.get("/", middleware.adminSession, adminController.getDashboard);
 
 router.get("/login", middleware.adminSession, adminController.getAdminLogin);
@@ -126,4 +126,7 @@ router.delete(
   adminController.deleteCoupon
 );
 
+
+router.get("/orders_list", middleware.adminSession, adminController.getOrderList)
+router.get("/order_details", middleware.adminSession, adminController.getOrderDetails)
 module.exports = router;
