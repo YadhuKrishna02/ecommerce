@@ -66,7 +66,7 @@
                  <buttton  class="btn btn-primary text-center" height:3rem" onclick="cancelorder('<%=orderDetails._id%>')">Cancel Order</buttton>
                 <%} %>
                 <%if(orderDetails. orderStatus=='Delivered'){ %>   
-                                                                    <buttton         class="btn btn-primary text-center" style="background: yellow; height:2rem" onclick="cancelorder('<%=orderDetails._id%>')">Return</buttton>
+                                                                    <buttton class="btn btn-primary text-center" style="background: slateblue; height:2rem" onclick="returnorder('<%=orderDetails._id%>')">Return</buttton>
                 <%} %>
                     </div>
                 <div class="d-flex justify-content-between pt-2">
@@ -121,6 +121,18 @@
       console.log(orderid);
    $.ajax({  
      url:'/cancel_order?orderid='+orderid,
+     method:'put',
+     success:(response)=>{
+      if(response){
+        location.reload()
+      }
+     }
+   })
+    }
+    function returnorder(orderid){
+      console.log(orderid);
+   $.ajax({  
+     url:'/return_order?orderid='+orderid,
      method:'put',
      success:(response)=>{
       if(response){

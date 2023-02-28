@@ -55,9 +55,11 @@ module.exports = {
               if (discountAmount > coupon.maxDiscountValue) {
                 console.log("amal");
                 discountAmount = coupon.maxDiscountValue;
-                resolve({ status: true, discountAmount: discountAmount });
+                total=total-discountAmount
+                resolve({ status: true, discountAmount: discountAmount,total: total });
               } else {
-                resolve({ status: true, discountAmount: discountAmount });
+                total=total-discountAmount
+                resolve({ status: true, discountAmount: discountAmount,total: total });
               }
             } else {
               console.log("ded1");

@@ -3,12 +3,27 @@ var express = require("express");
 var router = express.Router();
 const controllers = require("../controllers/usercontroller");
 const middleware = require("../middlewares/middleware");
+const { route } = require("./admin");
 /* GET home page. */
 router.get("/", controllers.getHome);
 
 router.get("/login", middleware.userSession, controllers.getUserLogin);
 
 router.post("/login", controllers.postUserLogin);
+
+router.get("/reset_password",middleware.userSession,controllers.getPasswordReset)
+
+router.post("/reset_password/:id",middleware.userSession,controllers.postPasswordReset)
+
+router.get("/enter_new_pwd/",middleware.userSession,controllers.getEnterNewPwd)
+
+router.put("/enter_new_pwd/:id",middleware.userSession,controllers.updatePassword)
+
+router.get("/profile/:id",middleware.userSession,controllers.getProfilePage);
+
+router.put("/profile/:id",controllers.changeProfile);
+
+
 
 router.get("/otp_login", controllers.getUserOtpLogin);
 
@@ -25,6 +40,13 @@ router.post("/signup", controllers.postSignUp);
 router.get("/shop", middleware.userSession, controllers.getShop);
 
 router.get("/logout", middleware.userSession, controllers.getLogout);
+
+//Wishlist starts here
+
+router.get("/add_to_wishlist/:prodId",middleware.userSession,controllers.getWishlist);
+router.get('/view_wishlist',middleware.userSession,controllers.viewWishlist);
+router.delete("/wishlist/:id",controllers.deleteFromWishlist)
+
 
 
 router.get(
@@ -58,11 +80,17 @@ router.get("/check_out", middleware.userSession, controllers.checkOutPage);
 
 router.post("/check_out",middleware.userSession,controllers.postcheckOutPage)
 
+router.post("/create_order",controllers.paypalOrder)
+
+router.get('/paypal_success',middleware.userSession,controllers.paypalSuccess)
+
 router.post('/verify_payment',middleware.userSession,controllers.postVerifyPayment)
 
 router.get('/order',middleware.userSession,controllers.getOrderPage)
 
 router.put('/cancel_order',middleware.userSession,controllers.getCancelOrder)
+
+router.put('/return_order',middleware.userSession,controllers.getReturnOrder)
 
 router.get('/order_details',middleware.userSession,controllers.orderDetails)
 
@@ -76,7 +104,7 @@ router.get('/order_success',middleware.userSession,controllers.getSuccessPage)
 //**********COUPON STARTS HERE************** */
 //************************************************************ */
 
-router.get("/apply_coupon", middleware.userSession, controllers.applyCoupon);
+router.post("/apply_coupon", middleware.userSession, controllers.applyCoupon);
 
 router.get(
   "/coupon_validator",

@@ -69,8 +69,15 @@
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="payment-method" value="online"  >
                 <label class="form-check-label" for="flexRadioDefault1">
-                  Online payment
+                  Razorpay
                 </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="payment-method" value="paypal"  >
+                <label class="form-check-label" for="flexRadioDefault1">
+                  Paypal
+                </label>
+                <div id="paypal"></div>
               </div>
               <div class="form-group">
                   <input   name="user"  value="<%=users%>"  type="hidden"  >
@@ -143,8 +150,13 @@
   </div>
 </section>
 
-
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=AVAoNPU15zJqf5MRI8KJpDLKK-kmlm3RR6F8RN9MLb1pkW7xSEXS2POZsHZcsxYZopqXMQhiS5MIOnBY&disable-funding=credit,card " data-namespace="paypal_sdk"></script>
+
+
+
+
+
 <script>
 
 
@@ -158,10 +170,14 @@
       success: (response) => {
         if (response.codstatus == true) {
           location.href = '/order_success';
-        } else {
-          razorpay(response);
+        }
+        else if (response.paypal == true) {
           console.log(response);
-          console.log(response.amount);
+            paypalPayment(response.price)
+          }
+           else {
+          razorpay(response);
+       
 
         }
       }
@@ -200,23 +216,83 @@
       rzp1.open(); 
 
 }
- 
-  function verifypayment(payment,order){
-    $.ajax({
-url:'verify_payment',
-        data:{
-            payment,
-            order
-        },
-        method:'post',
-        success: (response) => {
-        if(response.status){
-            location.href = '/order_success';
-        }else{
-            
-        }
 
+function paypalPayment(total) {
+  console.log(total);
+    paypal_sdk
+      .Buttons({
+        createOrder: function() {
+          return fetch("/create_order", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                total: total,
+                items: [{
+                  id: 1,
+                }]
+              }),
+            })
+            .then(res => {
+              if (res.ok) return res.json()
+              return res.json().then(json => Promise.reject(json))
+            })
+            .then(({
+              id
+            }) => {
+              return id
+            })
+            .catch(e => {
+              console.error(e.error)
+            })
+        },
+        onApprove: function(data, actions) {
+          return actions.order.capture().then(() => {
+            console.log(data);
+            $.ajax({
+              url: '/paypal_success',
+              method: 'get',
+              success: (response) => {
+                if (response.status) {
+                  location.replace('/success')
+                } else {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong!',
+                    footer: '<a href="/">Goto home page</a>'
+                  })
+                }
+              }
+            })
+          })
+        },
+      })
+      .render("#paypal")
+  }
+ 
+  function verifyPayment(payment, order) {
+    $.ajax({
+      url: '/verify-payment',
+      data: {
+        payment,
+        order
+      },
+      method: 'POST',
+      success: (response) => {
+        if (response.status)
+          location.replace("/order_success");
+        else {
+          //order Failed
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong!',
+            footer: '<a href="/">Goto home page</a>'
+          })
         }
+      }
     })
   }
 

@@ -23,25 +23,33 @@
           <div class="search-style-2"></div>
           <div class="header-action-right">
             <div class="header-action-2">
-              <% if(!locals.userSession){%>
+              <li class="dropdown nav-item" style="list-style: none;">
+                <a data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn5.vectorstock.com%2Fi%2Fthumb-large%2F04%2F09%2Fuser-icon-vector-5770409.jpg&f=1&nofb=1&ipt=cd5c65b1050b3260c6c55079ce0a1e365d19e45e9afde176b8af5c31d2c198d5&ipo=images" height="50rem" width="50rem" alt="User"></a>
+                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
+                     <% if(!locals.userSession){%>
 
-              <i class="fi-rs-user"></i
-              ><a href="/login" style="color: black">Log In</a>
+                    <a class="dropdown-item" href="/login" style="color: black">Log In</a>
 
-              <%} else{%>
+                     <%} else{%>
 
-              <i class="fi-rs-user"></i
-              ><a href="/logout" style="color: black">Log out</a>
+                <a class="dropdown-item" href="/profile/<%=locals.profileId%>">Edit Profile</a>
+              <a class="dropdown-item" href="/logout" style="color: red">Log out</a>
 
               <%} %>
+                </div>
+            </li>
               <div class="header-action-icon-2">
-                <a href="shop-wishlist.html">
+                <a href="/view_wishlist">
                   <img
                     class="svgInject"
                     alt="Evara"
                     src="assets/imgs/theme/icons/icon-heart.svg"
                   />
-                  <span class="pro-count blue">4</span>
+                  <% if(locals.userSession){%>
+                  <span class="pro-count blue" id="wishlist-count">
+                    <%= locals.wishcount %>
+                  </span>
+                  <%}%>
                 </a>
               </div>
               <div class="header-action-icon-2">
@@ -59,7 +67,7 @@
                 </a>
               </div>
             </div>
-            <div></div>
+      
           </div>
         </div>
       </div>

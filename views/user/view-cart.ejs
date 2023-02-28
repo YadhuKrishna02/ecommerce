@@ -98,14 +98,7 @@
                             />
                           </div>
                           <div class="form-group col-lg-6">
-                            <button
-                              class="btn btn-sm btn-outline-primary bg-light"
-                              style="width: 3em; height: 3em"
-                              type="button"
-                              onclick="couponValidator(this,'<%=total%>')"
-                            >
-                              <i class="icon-long-arrow-right"></i>
-                            </button>
+                            <button class="btn  btn-sm" type="button" onclick="couponValidator(this,'<%=total%>')"><i class="fi-rs-label mr-10"></i>Apply</button>
                           </div>
                         </div>
                       </form>
@@ -182,7 +175,11 @@
       },
       success: (response) => {
         if (response.removeProduct) {
-          alert("Product removed");
+          Swal.fire(
+         'OOPs!',
+         'Product removed from cart',
+         'success'
+)
           location.reload();
         } else {
           let cartQuantity = quantity + count;
@@ -193,8 +190,20 @@
       },
     });
   }
-  function removeItem(cartId, prodId) {
-    $.ajax({
+  function  removeItem(cartId, prodId) {
+    Swal
+      .fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      })
+      .then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
       url: "/delete_cart_item",
       data: {
         cartId: cartId,
@@ -203,10 +212,15 @@
       method: "DELETE",
       success: (response) => {
         if (response.removeProduct) {
+          
+          Swal.fire("Deleted!", "Your file has been deleted.", "success");
           location.reload();
         }
       },
     });
+        }
+      });
+   
   }
   function couponValidator(elem, total) {
     code = document.getElementById("code").value.trim();
@@ -224,7 +238,10 @@
               if (response.status == true) {
                 $.ajax({
                   url: "/apply_coupon?code=" + code,
-                  method: "get",
+                  method: "post",
+                  data:{
+                    total:total
+                  },
                   success: (response) => {
                    
 
@@ -235,8 +252,7 @@
                         "Coupon Applied Succesfully";
                       document.getElementById("total").innerHTML =
                         total - response.discountAmount;
-                      // couponTotal.innerHTML = `₹ ${
-                      //   total - response.discountAmount
+                      
                     } else {
                       document.querySelector(".couponErr").style.color =
                         "#ff0707";

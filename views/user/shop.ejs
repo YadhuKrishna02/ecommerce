@@ -81,12 +81,21 @@
                     >
                       <i class="fi-rs-search"></i
                     ></a>
-                    <a
-                      aria-label="Add To Wishlist"
-                      class="action-btn hover-up"
-                      href="shop-wishlist.html"
-                      ><i class="fi-rs-heart"></i
-                    ></a>
+                    <button
+                    type="button"
+                    aria-label="Add To Wishlist"
+                    class="action-btn hover-up"
+                    onclick="addToWishlist('<%-response._id%>')"
+                    Swal.fire({
+                      position: 'center',
+                      icon: 'success',
+                      title: 'Product is successfully added to wishlist',
+                      showConfirmButton: false,
+                      timer: 1500
+                    })
+                  >
+                    <i class="fi-rs-heart"></i>
+                  </button>
                     <a
                       aria-label="Compare"
                       class="action-btn hover-up"
@@ -190,6 +199,20 @@
         }
       },
     });
+  }
+
+  function addToWishlist(prodId){
+    $.ajax({
+      url:"/add_to_wishlist/"+prodId,
+      method:"get",
+      success:(response)=>{
+        if (response.status) {
+          let wishlistCount = $("#wishlist-count").html();
+          wishlistCount = parseInt(wishlistCount) + 1;
+          $("#wishlist-count").html(wishlistCount);
+        }
+      }
+    })
   }
 
   function sendData(e){

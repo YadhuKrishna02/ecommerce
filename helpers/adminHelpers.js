@@ -210,4 +210,84 @@ module.exports = {
         });
     });
   },
+  orderPage: () => {
+    return new Promise(async (resolve, reject) => {
+
+      await user.order.aggregate([
+        {
+          $unwind: '$orders'
+        },
+        {
+          $sort: { 'orders: createdAt': -1 }
+        }
+      ]).then((response) => {
+        console.log(response);
+        resolve(response)
+
+      })
+    })
+
+  },
+  orderDetails: (orderId) => {
+    return new Promise(async (resolve, reject) => {
+
+      let order = await user.order.findOne({ 'orders._id': orderId }, { 'orders.$': 1 })
+      console.log(order + '----------------------------------------------------------------');
+      resolve(order)
+    })
+
+  },
+  getAllOrders:()=>
+  {
+    return new Promise(async (resolve, reject) => {
+      let order = await user.order.aggregate([
+        {$unwind: '$orders'},
+
+      ]).then((response) => {
+        console.log(response);
+        resolve(response)
+      })
+     
+    })
+  },
+
+  getOrderByDate:()=>
+  {
+     return new Promise(async (resolve, reject) => {
+      const startDate = new Date('2022-01-01');
+      await user.order.find({createdAt:{ $gte: startDate}}).then((response)=>
+      {
+        resolve(response)
+
+      })
+    });
+  },
+
+
+  getAllProducts:()=>
+  {
+    return new Promise(async(resolve, reject) => {
+      await user.product.find().then((response)=>
+      {
+        resolve(response)
+      }) 
+    })
+  },
+  changeOrderStatus: (orderId, data) => {
+    return new Promise(async (resolve, reject) => {
+      let orders = await user.order.findOne({ 'orders._id': orderId }, { 'orders.$': 1 })
+
+      let users = await user.order.updateOne(
+        { 'orders._id': orderId },
+        {
+          $set: {
+            'orders.$.orderStatus': data.status,
+
+          }
+        }
+      )
+      resolve(response)
+    })
+
+  },
 };

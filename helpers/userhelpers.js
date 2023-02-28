@@ -2,10 +2,14 @@ const user = require("../models/connection");
 const bcrypt = require("bcrypt");
 const { response } = require("../app");
 const ObjectId = require("mongodb").ObjectId;
+const { Convert } = require("easy-currencies");
 
 const otp = require("../otp/otp");
 const Razorpay = require('razorpay');
-const razorpay = require('../otp/razorpay')
+const razorpay = require('../otp/razorpay');
+const {  wishlist } = require("../models/connection");
+const { resolve } = require("path");
+const { editeduploads } = require("../multer/multer");
 var instance = new Razorpay({
   key_id: 'rzp_test_PhFuqLgHsH5Ajz',
   key_secret: 'UXvzfAkrkdiOg59z8kkBDaUJ',
@@ -25,7 +29,7 @@ module.exports = {
           response = { emailStatus: true };
           resolve(response);
         } else {
-          var hashedPassword = await bcrypt.hash(userData.password, 10);
+          let hashedPassword = await bcrypt.hash(userData.password, 10);
           const data = new user.user({
             username: userData.username,
             Password: hashedPassword,
@@ -69,6 +73,50 @@ module.exports = {
       }
     });
   },
+
+  verifyEmail:(userData)=>{
+
+    return new Promise(async(resolve, reject) => {
+      let email=await user.user.findOne({email:userData.email})
+      console.log(email);
+      if(email){
+        resolve({status:true})
+      }
+      else{
+        resolve({status:false})
+      }
+    })
+
+   
+  },
+  verifyPassword:(userData,userId)=>{
+
+    return new Promise(async(resolve, reject) => {
+      let users=await user.user.findOne({_id:userId})
+      console.log(users);
+      await bcrypt
+      .compare(userData.password, users.Password)
+      .then(async (status) => {
+        if(status){
+          let hashedPassword = await bcrypt.hash(userData.password2, 10);
+          await user.user.updateOne(
+            {_id:userId},
+            {$set:{
+              Password:hashedPassword
+            }}
+            ).then((response)=>{
+              console.log(response);
+              resolve(response)
+            })
+
+        }
+      });
+    })
+
+   
+  },
+
+
   documentCount:()=>{
     return new Promise(async(resolve, reject) => {
       await user.product.find().countDocuments().then((documents) => {
@@ -99,6 +147,95 @@ module.exports = {
       });
     });
   },
+
+  getUserdetails:(profileId)=>{
+    return new Promise(async (resolve, reject) => {
+      user.address
+        .findOne({userid:profileId})
+        .then((response) => {
+          resolve(response);
+        });
+    });
+  },
+
+  changeProfile:(profileId,editedData)=>{
+
+    return new Promise(async (resolve, reject) => {
+       user.address.
+        updateOne(
+          { userid: profileId},
+          {
+            $set: {
+              "Address.0.fname":editedData.fname,
+              "Address.0.lname":editedData.lname,
+              "Address.0.email":editedData.email,
+              "Address.0.mobile":parseInt(editedData.phone),
+              "Address.0.street":editedData.address
+
+            },
+          }
+        )
+        .then((response) => {
+          resolve(response);
+        });
+    });
+  },
+  //WISHLIST
+  addToWishlist: async(proId, userId) => {
+    
+    const proObj = {
+      productId: proId
+    };
+
+    return new Promise(async (resolve, reject) => {
+      let wishlist = await user.wishlist.findOne({ user: userId });
+      if (wishlist) {
+        let productExist = wishlist.wishlistItems.findIndex(
+          (item) => item.productId == proId
+        );
+         if(productExist==-1){
+          user.wishlist
+          .updateOne(
+            { user: userId},
+            {
+              $addToSet:{
+                wishlistItems:proObj
+              },
+            }
+          )
+          .then(() => {
+            resolve();
+          });
+         }
+        
+      } else {
+        const newWishlist = new user.wishlist({
+          user: userId,
+          wishlistItems:proObj
+        });
+      
+        await newWishlist.save().then((data) => {
+          resolve(data);
+        });
+      }
+    });
+  },
+  
+  getWishCount: (userId) => {
+    console.log('api called');
+    return new Promise(async (resolve, reject) => {
+      let count = 0;
+      let wishlist = await user.wishlist.findOne({ user: userId })
+      if (wishlist) {
+        count = wishlist.wishlistItems.length
+      }
+      resolve(count)
+
+    })
+  },
+    
+
+
   addToCart: (proId, userId) => {
     proObj = {
       productId: proId,
@@ -146,6 +283,46 @@ module.exports = {
           resolve(data);
         });
       }
+    });
+  },
+  viewWishlist: (userId) => {
+    return new Promise(async (resolve, reject) => {
+      const id = await user.wishlist
+        .aggregate([
+          {
+            $match: {
+              user: ObjectId(userId),
+            },
+          },
+          {
+            $unwind: "$wishlistItems",
+          },
+
+          {
+            $project: {
+              item: "$wishlistItems.productId",
+            },
+          },
+
+          {
+            $lookup: {
+              from: "products",
+              localField: "item",
+              foreignField: "_id",
+              as: "wish",
+            },
+          },
+          {
+            $project: {
+              item: 1,
+              wishlistItems: { $arrayElemAt: ["$wish", 0] },
+            },
+          },
+        ])
+        .then((wishlistItems) => {
+
+          resolve(wishlistItems);
+        });
     });
   },
   viewCart: (userId) => {
@@ -507,6 +684,7 @@ module.exports = {
 
     })
   },
+  
   verifyPayment: (details) => {
     return new Promise((resolve, reject) => {
       try {
@@ -623,11 +801,11 @@ module.exports = {
       })
     })
 
-  },
+  },  
   viewOrderDetails: (orderId) => {
     return new Promise(async (resolve, reject) => {
 
-  let productid = await user.order.findOne({ "orders._id": orderId },{'orders.$':1})
+  let productid = await user.order.findOne({ "orders._id": orderId },{'orders.$':1});
 
    
    let details=productid.orders[0]
@@ -655,13 +833,41 @@ module.exports = {
 
     
 
-      let orderIndex = orders[0].orders.findIndex(orders => orders._id == orderId)
+      let orderIndex = orders[0].orders.findIndex(orders => orders._id == orderId);
+      console.log(orderIndex + "order..................");
 
       await user.order.updateOne({ 'orders._id': orderId },
         {
           $set:
           {
             ['orders.' + orderIndex + '.orderStatus']: 'cancelled'
+
+          }
+
+
+        }).then((orders) => {
+          resolve(orders)
+        })
+
+    })
+
+
+  },
+  returnOrder: (orderId, userId) => {
+
+    return new Promise(async (resolve, reject) => {
+
+      let orders = await user.order.find({ 'orders._id': orderId })
+
+    
+
+      let orderIndex = orders[0].orders.findIndex(orders => orders._id == orderId)
+
+      await user.order.updateOne({ 'orders._id': orderId },
+        {
+          $set:
+          {
+            ['orders.' + orderIndex + '.orderStatus']: 'returned'
 
           }
 

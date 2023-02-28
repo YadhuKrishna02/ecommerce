@@ -129,4 +129,5 @@ router.delete(
 
 router.get("/orders_list", middleware.adminSession, adminController.getOrderList)
 router.get("/order_details", middleware.adminSession, adminController.getOrderDetails)
+router.post("/order_details", middleware.adminSession, adminController. postOrderDetails)
 module.exports = router;

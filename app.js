@@ -5,6 +5,8 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const expressLayouts = require("express-ejs-layouts");
 const session = require("express-session");
+require('dotenv').config()
+
 
 //sweet alert
 

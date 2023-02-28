@@ -39,15 +39,61 @@ module.exports = {
     }
   },
 
-  getDashboard: (req, res) => {
+  
+
+  getDashboard: async(req, res) =>{
+    
+ 
     let variable = req.session.admin;
 
-    res.render("admin/admin-dashboard", {
-      layout: "adminLayout",
-      variable,
-      adminStatus,
-    });
-  },
+    let totalProducts, days=[]
+    let ordersPerDay = {};
+  
+  
+   await adminHelper.getAllProducts().then((Products)=>
+    {
+    
+      totalProducts = Products.length
+    })
+  
+   await adminHelper.getOrderByDate().then((response)=>
+    {
+      let result = response[0].orders
+      for (let i = 0; i < result.length; i++) {
+        let ans={}
+        ans['createdAt']=result[i].createdAt
+        days.push(ans)
+        ans={}
+        
+      }
+      console.log(days);
+  
+  
+  days.forEach((order) => {
+    const day = order.createdAt.toLocaleDateString('en-US', { weekday: 'long' });
+    ordersPerDay[day] = (ordersPerDay[day] || 0) + 1;
+  
+  });
+  console.log(ordersPerDay);
+  
+    })
+  
+  
+  await  adminHelper.getAllOrders().then((response)=>
+    {
+  
+      var length = response.length
+      
+      let total = 0;
+      
+      for (let i = 0; i < length; i++) {
+        total += response[i].orders.totalPrice;
+      }
+      console.log(total);
+      res.render("admin/admin-dashboard",{ layout: "adminLayout" ,variable,adminStatus, length, total, totalProducts,ordersPerDay});
+  
+    }) 
+   },
   getViewUser: (req, res) => {
     adminHelper.getUsers().then((user) => {
       res.render("admin/view-users", {
@@ -251,12 +297,52 @@ module.exports = {
       res.json(response);
     });
   },
-  getOrderList:(req,res)=>{
+  getOrderList: (req, res) => {
 
-    res.render('admin/order-list',{layout:'adminLayout',adminStatus})
+
+    adminHelper.orderPage().then((response) => {
+      const getDate = (date) => {
+        let orderDate = new Date(date);
+        let day = orderDate.getDate();
+        let month = orderDate.getMonth() + 1;
+        let year = orderDate.getFullYear();
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        let seconds = date.getSeconds();
+        return `${isNaN(day) ? "00" : day}-${isNaN(month) ? "00" : month}-${isNaN(year) ? "0000" : year
+          } ${date.getHours(hours)}:${date.getMinutes(minutes)}:${date.getSeconds(seconds)}`;
+      };
+      res.render('admin/order-list', { layout: 'adminLayout',adminStatus, response, getDate })
+    })
   },
-  getOrderDetails:(req,res)=>{
-    res.render('admin/order-details',{layout:'adminLayout',adminStatus})
+  getOrderDetails: (req, res) => {
+    console.log(req.query.orderid);
+    adminHelper.orderDetails(req.query.orderid).then((order) => {
+      const getDate = (date) => {
+        let orderDate = new Date(date);
+        let day = orderDate.getDate();
+        let month = orderDate.getMonth() + 1;
+        let year = orderDate.getFullYear();
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        let seconds = date.getSeconds();
+        return `${isNaN(day) ? "00" : day}-${isNaN(month) ? "00" : month}-${isNaN(year) ? "0000" : year
+          } ${date.getHours(hours)}:${date.getMinutes(minutes)}:${date.getSeconds(seconds)}`;
+      };
+       
+      let products = order.orders[0].productDetails
+      let total = order.orders
+      res.render('admin/order-details', { layout: 'adminLayout',adminStatus, order, products, total, getDate })
+    })
 
   },
+  postOrderDetails:(req,res)=>{
+    console.log(typeof req.query.orderId);
+   console.log(req.body);
+    console.log(req.body);
+    adminHelper.changeOrderStatus(req.query.orderId,req.body).then((response)=>{
+             res.redirect('/admin/orders_list')
+    })
+
+  }
 };
