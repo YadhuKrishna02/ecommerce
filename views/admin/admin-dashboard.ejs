@@ -6,7 +6,7 @@
         <p>Whole data about your business here</p>
       </div>
       <div>
-        <a href="#" class="btn btn-primary"
+        <a href="/admin/sales_report" class="btn btn-primary"
           ><i class="text-muted material-icons md-post_add"></i>Create report</a
         >
       </div>
@@ -51,8 +51,28 @@
               <span><%=locals.totalProducts%></span>
               
             </div>
+            
           </article>
         </div>
+
+        
+      </div>
+      <div class="col-lg-3">
+        <div class="card card-body mb-4">
+          <article class="icontext">
+            <span class="icon icon-sm rounded-circle bg-warning-light"
+              ><i class="text-warning material-icons md-qr_code"></i
+            ></span>
+            <div class="text">
+              <h6 class="mb-1 card-title">Total Users</h6>
+              <span><%=locals.totalUserCount%></span>
+              
+            </div>
+            
+          </article>
+        </div>
+
+        
       </div>
     
     </div>
@@ -69,7 +89,7 @@
       <div class="col-xl-4 col-lg-12">
         <div class="card mb-4">
           <article class="card-body">
-            <h5 class="card-title">Revenue Base on Area</h5>
+            <h5 class="card-title">Types of Orders</h5>
             <canvas id="myChart2" height="217"></canvas>
           </article>
         </div>
@@ -96,10 +116,12 @@
 
     <div>
       <p style="visibility: hidden;" id="days"><%= JSON.stringify(locals.ordersPerDay) %></p>
+      <p style="visibility: hidden;" id="payment"><%=JSON.stringify(locals.paymentCount) %></p>
     </div>
   </section>
  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+
   <script>
     document.write(new Date());
     
@@ -121,13 +143,13 @@
    }
    
    new Chart("myChart1", {
-    type: "line",
+    type: "bar",
     data: {
       labels: xValues,
       datasets: [{
         fill: false,
         lineTension: 0,
-        backgroundColor: "rgba(0,0,255,1.0)",
+        backgroundColor: "yellow",
         borderColor: "rgba(0,0,255,0.1)",
         data: buyed,
         label:'Sales'
@@ -136,10 +158,46 @@
     options: {
       legend: {display: false},
       scales: {
-        yAxes: [{ticks: {min: 6, max:16}}],
+        yAxes: [{ticks: {min: 0, max:25}}],
       }
     }
   });
+
+  
+
+  var xValue = ["Online","COD"];
+  var yValue = [];
+         let paymentData = JSON.parse(document.getElementById('payment').innerHTML);
+       yValue.push(paymentData[0])
+       yValue.push(paymentData[1])
+         
+  var barColors = [
+    "yellow",
+    "#seablue",
+    "#purple",
+    "#grey",
+    "#red"
+  ];
+  
+  new Chart("myChart2", {
+    type: "pie",
+    data: {
+      labels: xValue,
+      datasets: [{
+        backgroundColor: barColors,
+        data: yValue
+      }]
+    },
+    options: {
+      title: {
+        display: true,
+        text: "Payment mode"
+      }
+    }
+  });
+  
+
+  
   </script>
  
 

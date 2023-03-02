@@ -187,6 +187,33 @@ const couponSchema = new mongoose.Schema({
   },
 });
 
+const bannerSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true
+  },
+  image: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  link: {
+    type: String,
+    required: true
+  },
+  created_at: {
+    type: Date,
+    default: Date.now
+  },
+  updated_at: {
+    type: Date,
+    default: Date.now
+  }
+});
+
 //  module.exports=db
 
 module.exports = {
@@ -198,6 +225,7 @@ module.exports = {
   address:mongoose.model('address',addressSchema),
   coupon: mongoose.model("coupon", couponSchema),
   otp:mongoose.model("otp",otpSchema),
-  wishlist:mongoose.model("wishlist",wishlistSchema)
+  wishlist:mongoose.model("wishlist",wishlistSchema),
+  banner :mongoose.model('Banner', bannerSchema),
 
 };

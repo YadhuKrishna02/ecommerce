@@ -22,7 +22,7 @@ const paypalClient = new paypal.core.PayPalHttpClient(
 
 const client = require("twilio")(otp.accountId, otp.authToken);
 
-let userSession, number, loggedUser,profileId,userDetails,userAddDetails;
+let userSession, number, loggedUser,profileId,userDetails,userAddDetails,getDate;
 let count,wishcount,
   otpNumber,total
   couponPrice = 0;
@@ -126,7 +126,7 @@ module.exports = {
   },
   postSignUp: (req, res) => {
     userhelpers.doSignUp(req.body).then((response) => {
-      var emailStatus = response.emailStatus;
+    let emailStatus = response.emailStatus;
       if (emailStatus == false) {
         res.redirect("/login");
       } else {
@@ -210,10 +210,27 @@ module.exports = {
       res.json({ status: true });
     });
   },
+
   viewWishlist:async(req,res)=>{
 
     let wishlistItems = await userhelpers.viewWishlist(req.session.user.id);
     res.render("user/wishlist",{userSession,profileId,count,wishlistItems,wishcount})
+  },
+  deleteWishList: (body) => {
+
+    return new Promise(async (resolve, reject) => {
+
+      let product = await user.wishlist.updateOne({ _id:body.wishlistId },
+        {
+          "$pull":
+
+            { wishlistItems: { productId: body.productId} }
+        }).then(() => {
+          resolve({ removeProduct: true })
+        })
+
+      
+    })
   },
 
   getViewCart: async (req, res) => {
@@ -254,11 +271,13 @@ module.exports = {
     res.redirect("/login");
   },
 
-  deleteFromWishlist:async (req,res)=>{
-    userhelpers.deleteCart(req.body).then((response) => {
-      res.json(response);
-    });
-  },
+  deleteWishList: (req, res) => {
+    userhelpers.deleteWishList(req.body).then((response)=>{
+    
+      res.json(response)
+    
+    })
+      },
 
   checkOutPage:async (req, res) => {
     
@@ -397,29 +416,31 @@ paypalSuccess: async (req, res) => {
 orderDetails: async (req, res) => {
 
   let orderId = req.query.order
-  const getDate = (date) => {
+   getDate = (date) => {
     let orderDate = new Date(date);
     let day = orderDate.getDate();
     let month = orderDate.getMonth() + 1;
     let year = orderDate.getFullYear();
-    let hours = date.getHours();
-    let minutes = date.getMinutes();
-    let seconds = date.getSeconds();
+   
     return `${isNaN(day) ? "00" : day}-${isNaN(month) ? "00" : month}-${isNaN(year) ? "0000" : year
-      } ${date.getHours(hours)}:${date.getMinutes(minutes)}:${date.getSeconds(seconds)}`;
+      }`;
   };
 
-  userhelpers.viewOrderDetails(orderId).then((response) => {
+  userhelpers.viewOrderDetails(orderId).then(async(response) => {
     let products = response.products[0]
     let address = response.address
     let orderDetails = response.details
+    let data = userhelpers.createData(response,getDate)
 
-    res.render('user/order-details', { products, address, orderDetails, userSession,profileId, count, getDate })
+    res.render('user/order-details', { products, address, orderDetails, userSession,profileId, count, getDate,data })
 
   })
 
+  
+
 },
  
+
  
  getAddresspage: async (req, res) => {
  

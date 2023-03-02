@@ -1,11 +1,12 @@
-var express = require("express");
+let express = require("express");
 const { getMaxListeners } = require("../app");
 const adminController = require("../controllers/admincontroller");
 const adminHelper = require("../helpers/adminHelpers");
-var router = express.Router();
+let router = express.Router();
 const user = require("../models/connection");
 const multer = require("../multer/multer");
 const middleware = require("../middlewares/middleware");
+const uploads = require("../multer/multer");
                    
 router.get("/", middleware.adminSession, adminController.getDashboard);
 
@@ -128,6 +129,20 @@ router.delete(
 
 
 router.get("/orders_list", middleware.adminSession, adminController.getOrderList)
+
 router.get("/order_details", middleware.adminSession, adminController.getOrderDetails)
+
 router.post("/order_details", middleware.adminSession, adminController. postOrderDetails)
+
+router.get("/add_banner",middleware.adminSession, adminController.getAddBanner)
+
+router.post("/add_banner",uploads.addBannerupload,middleware.adminSession, adminController.postAddBanner)
+
+router.get("/list_banner",middleware.adminSession, adminController.listBanner)
+
+router.get("/edit_banner",middleware.adminSession, adminController.getEditBanner)
+
+router.post("/edit_banner",uploads.editBannerupload,middleware.adminSession, adminController.postEditBanner)
+
+router.get('/sales_report',adminController.getSalesReport)
 module.exports = router;

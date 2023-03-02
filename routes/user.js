@@ -1,6 +1,6 @@
 const { application } = require("express");
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
 const controllers = require("../controllers/usercontroller");
 const middleware = require("../middlewares/middleware");
 const { route } = require("./admin");
@@ -44,8 +44,10 @@ router.get("/logout", middleware.userSession, controllers.getLogout);
 //Wishlist starts here
 
 router.get("/add_to_wishlist/:prodId",middleware.userSession,controllers.getWishlist);
+
 router.get('/view_wishlist',middleware.userSession,controllers.viewWishlist);
-router.delete("/wishlist/:id",controllers.deleteFromWishlist)
+
+router.delete('/delete_wishlist',middleware.userSession,controllers.deleteWishList)
 
 
 

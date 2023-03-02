@@ -7,6 +7,11 @@
             
               
               <h5 class="text-muted mb-0">Thanks for your Order, <span style="color: black;"><%=orderDetails.name%></span>!</h5>
+              <p style="display: none"; id="yadhu"><%= JSON.stringify(locals.data) %></p>
+              <%if(orderDetails.orderStatus == 'Delivered'){%>
+            
+                <button  class=" mt-5 btn btn-suucess" onclick="invoiceCreator()">Download invoice</button>
+              <%}%>
             </div>
             <div class="card-body p-4">
               <div class="d-flex justify-content-between align-items-center mb-4">
@@ -141,4 +146,18 @@
      }
    })
     }
+
+    
+  function invoiceCreator() {
+    //Import the library into your project
+    let data = JSON.parse(document.getElementById('yadhu').innerHTML);
+    console.log(data);
+     
+    //Create your invoice! Easy!
+    easyinvoice.createInvoice(data, function (result) {
+      //The response will contain a base64 encoded PDF file
+      console.log("PDF base64 string: ", result.pdf);
+      easyinvoice.download("invoice.pdf");
+    });
+  }
   </script>

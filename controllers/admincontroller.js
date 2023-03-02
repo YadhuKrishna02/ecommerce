@@ -44,18 +44,31 @@ module.exports = {
   getDashboard: async(req, res) =>{
     
  
-    let variable = req.session.admin;
+    let letiable = req.session.admin;
 
     let totalProducts, days=[]
     let ordersPerDay = {};
-  
+   let paymentCount=[]
   
    await adminHelper.getAllProducts().then((Products)=>
     {
     
       totalProducts = Products.length
     })
-  
+    let orderByCod=  await adminHelper.getCodCount()
+ 
+    let codCount=orderByCod.length
+ 
+    let orderByOnline= await adminHelper.getOnlineCount()
+    let totalUser= await adminHelper.totalUserCount()
+ 
+    let totalUserCount=totalUser.length
+ 
+    let onlineCount=orderByOnline.length;
+ 
+   
+    paymentCount.push(onlineCount)
+    paymentCount.push(codCount)
    await adminHelper.getOrderByDate().then((response)=>
     {
       let result = response[0].orders
@@ -82,7 +95,7 @@ module.exports = {
   await  adminHelper.getAllOrders().then((response)=>
     {
   
-      var length = response.length
+      let length = response.length
       
       let total = 0;
       
@@ -90,7 +103,7 @@ module.exports = {
         total += response[i].orders.totalPrice;
       }
       console.log(total);
-      res.render("admin/admin-dashboard",{ layout: "adminLayout" ,variable,adminStatus, length, total, totalProducts,ordersPerDay});
+      res.render("admin/admin-dashboard",{ layout: "adminLayout" ,letiable,adminStatus, length, total, totalProducts,ordersPerDay,paymentCount,totalUserCount});
   
     }) 
    },
@@ -133,7 +146,7 @@ module.exports = {
   postCategory: (req, res) => {
     console.log(req.body.categoryname);
     adminHelper.addCategory(req.body).then((data) => {
-      var categoryStatus = data.categoryStatus;
+      let categoryStatus = data.categoryStatus;
       if (categoryStatus == false) {
         res.redirect("/admin/add_category");
       } else {
@@ -200,7 +213,7 @@ module.exports = {
   },
   editViewProduct: (req, res) => {
     adminHelper.viewAddCategory().then((response) => {
-      var procategory = response;
+      let procategory = response;
       adminHelper.editProduct(req.params.id).then((response) => {
         editproduct = response;
         res.render("admin/edit-product", {
@@ -343,6 +356,72 @@ module.exports = {
     adminHelper.changeOrderStatus(req.query.orderId,req.body).then((response)=>{
              res.redirect('/admin/orders_list')
     })
+
+  },
+
+  getAddBanner: (req, res) => {
+
+    res.render('admin/add-banner', { layout: 'adminLayout' })
+  },
+  postAddBanner: (req, res) => {
+
+    adminHelper.addBanner(req.body, req.file.filename).then((response) => {
+
+      res.redirect('/admin/add_banner')
+
+    })
+  },
+
+  //edit banner
+
+  listBanner: (req, res) => {
+
+    adminHelper.listBanner().then((response) => {
+
+      let admins=req.session.admin
+
+      res.render('admin/list-banner', { layout: 'adminLayout', response ,admins})
+
+    })
+
+  },
+
+  //edit banner
+
+
+  getEditBanner: (req, res) => {
+
+    adminHelper.editBanner(req.query.banner).then((response) => {
+     
+      res.render('admin/edit-banner', { layout: 'adminLayout', response })
+
+    })
+
+  },
+
+  // post edit banner 
+
+
+  postEditBanner: (req, res) => {
+
+    adminHelper.postEditBanner(req.query.editbanner, req.body,req.file.filename).then((response) => {
+ res.redirect('/admin/list_banner')
+
+    })
+  },
+
+  getSalesReport:async (req, res)=>
+  {
+    let report = await adminHelper.getSalesReport()
+    let Details = []
+    
+    report.forEach(orders => {Details.push( orders.orders)})
+    // report.forEach(orders => {userdata.push( orders.orders.shippingAddress)})
+
+    console.log(Details);
+
+    res.render('admin/sales-report',{layout: "adminLayout",adminStatus,Details})
+
 
   }
 };

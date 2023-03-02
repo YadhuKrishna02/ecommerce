@@ -207,9 +207,9 @@
       method:"get",
       success:(response)=>{
         if (response.status) {
-          let wishlistCount = $("#wishlist-count").html();
+          let wishlistCount = $("#wishcount").html();
           wishlistCount = parseInt(wishlistCount) + 1;
-          $("#wishlist-count").html(wishlistCount);
+          $("#wishcount").html(wishlistCount);
         }
       }
     })
