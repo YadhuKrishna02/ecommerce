@@ -1,16 +1,30 @@
 <div class="main_container container">
 
     <div class="d-flex justify-content-center m-4">
-        <button type="button" class="btn btn-danger btn_print me-3" 
+        <button type="button" class="btn btn-danger btn_print me-3"
             value="Download as Pdf">Download PDF</button>
         <button type="button" class="btn btn-danger btn_print me-3" onclick="export_data()"
             value="Export to excel">Download as Excel</button>
    
     <div>
+<!-- <form>
+<div> <input type="date" name="startdate" id="startdate"></div>
+ 
+  <div><input type="date" name="enddate" id="enddate" ></div>
 
+</form> -->
+<form action="/admin/sales_report" method="POST">
+
+  <div> <input type="date" name="startdate" id="startdate"></div>
+
+  <div><input type="date" name="enddate" id="enddate"></div>
+
+  
 </div> 
+  <div class="ml-3 my-auto"><button class="btn btn-primary " type="submit">submit</button></div>
    
-   <input class="ms-1" type="text" name="daterange" value="01/01/2022 - 12/01/2023"/>
+   <!-- <input class="ms-1" type="text" name="daterange" value="01/01/2022 - 12/01/2023"/> -->
+</form>
    
     </div>
 
@@ -20,7 +34,7 @@
     <thead>
       <tr>
         <th scope="col">OrderId</th>
-        <th scope="col">user Name</th>
+        <th scope="col">User Name</th>
         <th scope="col">Item Name</th>
         <th scope="col">Quantity</th>
         <th scope="col">Price</th>
@@ -32,25 +46,27 @@
         <% Details.forEach((order)=>{ %>
       <tr>
         <td><%=order._id%></td>
-        <td><%=order.shippingAddress.fname%></td>
+        <td><%=order.name%></td>
         <td><%=order.productDetails[0].productsName%></td>
         <td><%=order.productDetails[0].quantity%></td>
-        <td><%=order.productDetails[0].productsPrice%></td>
+        <td>₹<%=order.productDetails[0].productsPrice%></td>
         <td><%=order.paymentmode%></td>
-        <td><%=order.createdAt%></td>
+        <td><%=getDate(order.createdAt)%></td>
+        
 
       </tr>
       <%})%>
 
      
+      <h5 class="text-right">Total Earnings: &nbsp; <span class="fw-bold"></span>₹<%=total%> </h5>
     </tbody>
+
   </table>
 
 </div>
 <br>
 <br>
 <hr>
-<h5 class="text-right">Total Earnings: &nbsp; <span class="fw-bold">24,0000</span> </h5>
 
 <hr>
 
@@ -74,8 +90,6 @@ $(document).ready(function ($) {
             html2pdf().set(opt).from(element).save();
         });
     });
-
-
 
 
 

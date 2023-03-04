@@ -1,165 +1,181 @@
-
-
 <section class="mt-50 mb-50">
   <div class="container">
-     
-     
-      <div class="row">
-          <div class="col-md-6">
-              <div class="mb-25">
-                  <h4>Select Your Address</h4>
-              </div>
-             
-              <br>
-             
-              <form  action="/check_out" method="POST" id="checkout-form">
-                  <% response.forEach(function(response) { %>
-                  <div>
-              <div class="payment_option">
-                  
-                <div class="list-group-item" style="border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem;">
-                  <div class="list-group-item-heading">
-                    <div class="row radio">
-                      <div class="col-xs-3">
-                        <label>
-                          <input
-                            type="radio"
-                            name="optionShipp"
-                            id="optionShipp1"
-                            value="option2"
-                            style="height: 1.2rem; width: 1.2rem"
-                            checked
-                          />
-                          <%=response.item.fname%>:<%=response.item.lname%>
-                        </label>
-                      </div>
-                      <div class="col-xs-5">
-                        <dl class="dl-small">
-                          <dt><%=response.item.street%></dt>
-                          <dd><%=response.item.apartment%></dd>
-                          <dd><%=response.item.city%></dd>
-                          <dd><%=response.item.state%></dd>
-                          <dd><%=response.item.pincode%></dd>
-                          <dd><%=response.item.mobile%></dd>
-                          <dd><%=response.item.email%></dd>
-                        </dl>
-                        <!-- <button class="btn btn-sm">Edit</button>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="mb-25">
+          <h4>Select Your Address</h4>
+        </div>
+
+        <br />
+
+        <form action="/check_out" method="POST" id="checkout-form">
+          <% response.forEach(function(response) { %>
+          <div>
+            <div class="payment_option">
+              <div
+                class="list-group-item"
+                style="
+                  border-radius: 1rem;
+                  padding: 1.5rem;
+                  margin-bottom: 2rem;
+                "
+              >
+                <div class="list-group-item-heading">
+                  <div class="row radio">
+                    <div class="col-xs-3">
+                      <label>
+                        <input
+                          type="radio"
+                          name="address"
+                          id="address1"
+                          value="<%=response.item._id%>"
+                          style="height: 1.2rem; width: 1.2rem"
+                          checked
+                        />
+                        <%=response.item.fname%>:<%=response.item.lname%>
+                      </label>
+                    </div>
+                    <div class="col-xs-5">
+                      <dl class="dl-small">
+                        <dt><%=response.item.street%></dt>
+                        <dd><%=response.item.apartment%></dd>
+                        <dd><%=response.item.city%></dd>
+                        <dd><%=response.item.state%></dd>
+                        <dd><%=response.item.pincode%></dd>
+                        <dd><%=response.item.mobile%></dd>
+                        <dd><%=response.item.email%></dd>
+                      </dl>
+                      <!-- <button class="btn btn-sm">Edit</button>
                         <button class="btn btn-sm btn-link">
                           Delete this address
                         </button> -->
-                      </div>
                     </div>
                   </div>
-                </div> 
-                  
-                  
+                </div>
               </div>
-              
-              
+            </div>
           </div>
-          <% }) %> 
+          <% }) %>
           <div class="payment_method">
             <p>Payment Method</p>
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="payment-method" value="COD" checked >
-                <label class="form-check-label" for="flexRadioDefault1">
-                  COD
-                </label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="payment-method" value="online"  >
-                <label class="form-check-label" for="flexRadioDefault1">
-                  Razorpay
-                </label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="payment-method" value="paypal"  >
-                <label class="form-check-label" for="flexRadioDefault1">
-                  Paypal
-                </label>
-                <div id="paypal"></div>
-              </div>
-              <div class="form-group">
-                  <input   name="user"  value="<%=users%>"  type="hidden"  >
-              </div>
+              <input
+                class="form-check-input"
+                type="radio"
+                name="payment-method"
+                value="COD"
+                checked
+              />
+              <label class="form-check-label" for="flexRadioDefault1">
+                COD
+              </label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="payment-method"
+                value="online"
+              />
+              <label class="form-check-label" for="flexRadioDefault1">
+                Razorpay
+              </label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="payment-method"
+                value="paypal"
+              />
+              <label class="form-check-label" for="flexRadioDefault1">
+                Paypal
+              </label>
+              <div id="paypal"></div>
+            </div>
+            <div class="form-group">
+              <input name="user" value="<%=users%>" type="hidden" />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-fill-out btn-block mt-30">
+            Proceed to payment
+          </button>
+        </form>
+
+        <br />
+        <div
+          style="
+            width: 35rem;
+            height: 3rem;
+            background-color: whitesmoke;
+            padding: 20px;
+          "
+        >
+          <a href="/add_address"> <h5>+ Add an address</h5></a>
         </div>
-     <button type="submit"  class="btn btn-fill-out btn-block mt-30">Proceed to payment</button>
-          </form>
+      </div>
 
-             
-              <br>
-              <div style="width: 35rem; height: 3rem;background-color: whitesmoke; padding: 20px;">
-                  <a href="/add_address"> <h5>+ Add an address</h5></a>
-                   
-              </div>
+      <div class="col-md-6">
+        <div class="order_review">
+          <div class="mb-20">
+            <h4>Your Orders</h4>
+          </div>
+          <div class="table-responsive order_table text-center">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th colspan="2">Product</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% cartItems.forEach(function(cartItems){%>
+                <tr>
+                  <td class="image product-thumbnail">
+                    <img src="/uploads/<%=cartItems.cartItems.Image %>" />
+                  </td>
+                  <td>
+                    <h5>
+                      <a href="shop-product-full.html"
+                        ><%=cartItems.cartItems.Productname%></a
+                      >
+                    </h5>
+                    <span class="product-qty"> x<%=cartItems.quantity%></span>
+                  </td>
+                  <td><%= cartItems.cartItems.Price%></td>
+                </tr>
+                <%}) %>
 
-
-</div>
-  
-      
-<div class="col-md-6">
-<div class="order_review">
-<div class="mb-20">
-  <h4>Your Orders</h4>
-</div>
-<div class="table-responsive order_table text-center">
-  <table class="table">
-      <thead>
-          <tr>
-              <th colspan="2">Product</th>
-              <th>Price</th>
-          </tr>
-      </thead>
-      <tbody>
-          <% cartItems.forEach(function(cartItems){%>
-          <tr>
-             
-                  
-              <td class="image product-thumbnail"><img src="/uploads/<%=cartItems.cartItems.Image %>"  ></td>
-              <td>
-                  
-                  <h5><a href="shop-product-full.html"><%=cartItems.cartItems.Productname%></a></h5> <span class="product-qty"> x<%=cartItems.quantity%></span>
-              </td>
-              <td><%= cartItems.cartItems.Price%></td>
-              
-          </tr>
-          <%}) %>
-         
-          <!-- <tr>
+                <!-- <tr>
               <th>SubTotal</th>
               <td class="product-subtotal" colspan="2">$280.00</td>
           </tr> -->
-          <tr>
-              <th>Shipping</th>
-              <td colspan="2"><em>Free Shipping</em></td>
-          </tr>
-          <tr>
-              <th>Total</th>
-              <td colspan="2" class="product-subtotal"><span class="font-xl text-brand fw-900"><%=total%></span></td>
-           
-          </tr>
-      </tbody>
-  </table>
-</div>
-
-
-</div>
-</div>
-          
+                <tr>
+                  <th>Shipping</th>
+                  <td colspan="2"><em>Free Shipping</em></td>
+                </tr>
+                <tr>
+                  <th>Total</th>
+                  <td colspan="2" class="product-subtotal">
+                    <span class="font-xl text-brand fw-900"><%=total%></span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
+    </div>
   </div>
 </section>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script src="https://www.paypal.com/sdk/js?client-id=AVAoNPU15zJqf5MRI8KJpDLKK-kmlm3RR6F8RN9MLb1pkW7xSEXS2POZsHZcsxYZopqXMQhiS5MIOnBY&disable-funding=credit,card " data-namespace="paypal_sdk"></script>
-
-
-
-
+<script
+  src="https://www.paypal.com/sdk/js?client-id=AVAoNPU15zJqf5MRI8KJpDLKK-kmlm3RR6F8RN9MLb1pkW7xSEXS2POZsHZcsxYZopqXMQhiS5MIOnBY&disable-funding=credit,card "
+  data-namespace="paypal_sdk"
+></script>
 
 <script>
-
-
   $('#checkout-form').submit((e) => {
     e.preventDefault();
 
@@ -170,84 +186,79 @@
       success: (response) => {
         if (response.codstatus == true) {
           location.href = '/order_success';
-        }
-        else if (response.paypal == true) {
+        } else if (response.paypal == true) {
           console.log(response);
-            paypalPayment(response.price)
-          }
-           else {
+          paypalPayment(response.price);
+        } else {
           razorpay(response);
-       
-
         }
-      }
+      },
     });
   });
 
   function razorpay(order) {
     console.log(order);
     var options = {
-      "key": "rzp_test_PhFuqLgHsH5Ajz", // Enter the Key ID generated from the Dashboard
-      "amount":Number(order.amount), // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise,
-      "currency": "INR",
-      "name": "WHITE SPARROW",
-      "description": "Test Transaction",
-      "image": "https://example.com/your_logo",
-      "order_id": order.id, //This is a sample Order ID. Pass the id obtained in the response of Step 1
-      "handler": function (response) {
-      //   alert(response.razorpay_payment_id);
-      //   alert(response.razorpay_order_id);
-      //   alert(response.razorpay_signature)
-        verifypayment(response, order)
+      key: 'rzp_test_PhFuqLgHsH5Ajz', // Enter the Key ID generated from the Dashboard
+      amount: Number(order.amount), // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise,
+      currency: 'INR',
+      name: 'WHITE SPARROW',
+      description: 'Test Transaction',
+      image: 'https://example.com/your_logo',
+      order_id: order.id, //This is a sample Order ID. Pass the id obtained in the response of Step 1
+      handler: function (response) {
+        //   alert(response.razorpay_payment_id);
+        //   alert(response.razorpay_order_id);
+        //   alert(response.razorpay_signature)
+        verifypayment(response, order);
       },
-      "prefill": {
-        "name": "Gaurav Kumar",
-        "email": "gaurav.kumar@example.com",
-        "contact": "9999999999"
+      prefill: {
+        name: 'Gaurav Kumar',
+        email: 'gaurav.kumar@example.com',
+        contact: '9999999999',
       },
-      "notes": {
-        "address": "Razorpay Corporate Office"
+      notes: {
+        address: 'Razorpay Corporate Office',
       },
-      "theme": {
-        "color": "#3399cc"
-      }
+      theme: {
+        color: '#3399cc',
+      },
     };
-    var rzp1 = new Razorpay(options )
-      rzp1.open(); 
+    var rzp1 = new Razorpay(options);
+    rzp1.open();
+  }
 
-}
-
-function paypalPayment(total) {
-  console.log(total);
+  function paypalPayment(total) {
+    console.log(total);
     paypal_sdk
       .Buttons({
-        createOrder: function() {
-          return fetch("/create_order", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                total: total,
-                items: [{
+        createOrder: function () {
+          return fetch('/create_order', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              total: total,
+              items: [
+                {
                   id: 1,
-                }]
-              }),
+                },
+              ],
+            }),
+          })
+            .then((res) => {
+              if (res.ok) return res.json();
+              return res.json().then((json) => Promise.reject(json));
             })
-            .then(res => {
-              if (res.ok) return res.json()
-              return res.json().then(json => Promise.reject(json))
+            .then(({ id }) => {
+              return id;
             })
-            .then(({
-              id
-            }) => {
-              return id
-            })
-            .catch(e => {
-              console.error(e.error)
-            })
+            .catch((e) => {
+              console.error(e.error);
+            });
         },
-        onApprove: function(data, actions) {
+        onApprove: function (data, actions) {
           return actions.order.capture().then(() => {
             console.log(data);
             $.ajax({
@@ -255,45 +266,43 @@ function paypalPayment(total) {
               method: 'get',
               success: (response) => {
                 if (response.status) {
-                  location.replace('/success')
+                  location.replace('/success');
                 } else {
                   Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
                     text: 'Something went wrong!',
-                    footer: '<a href="/">Goto home page</a>'
-                  })
+                    footer: '<a href="/">Goto home page</a>',
+                  });
                 }
-              }
-            })
-          })
+              },
+            });
+          });
         },
       })
-      .render("#paypal")
+      .render('#paypal');
   }
- 
+
   function verifyPayment(payment, order) {
     $.ajax({
       url: '/verify-payment',
       data: {
         payment,
-        order
+        order,
       },
       method: 'POST',
       success: (response) => {
-        if (response.status)
-          location.replace("/order_success");
+        if (response.status) location.replace('/order_success');
         else {
           //order Failed
           Swal.fire({
             icon: 'error',
             title: 'Oops...',
             text: 'Something went wrong!',
-            footer: '<a href="/">Goto home page</a>'
-          })
+            footer: '<a href="/">Goto home page</a>',
+          });
         }
-      }
-    })
+      },
+    });
   }
-
 </script>

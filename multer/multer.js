@@ -1,4 +1,4 @@
-const multer= require('multer')
+const multer = require('multer')
 
 const Storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -9,7 +9,7 @@ const Storage = multer.diskStorage({
     }
 });
 
-  const editedStorage = multer.diskStorage({
+const editedStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'public/uploads')
     },
@@ -37,10 +37,10 @@ const editBanner = multer.diskStorage({
 });
 
 
-module.exports={
-    uploads:multer({storage:Storage}).array('file',4),
-    editeduploads:multer({storage:editedStorage}).array('file2',4),
-    addBannerupload:multer({storage:addBanner}).single('image'),
-    editBannerupload:multer({storage:editBanner}).single('image1'),
+module.exports = {
+    uploads: multer({ storage: Storage }).array('file', 4),
+    editeduploads: multer({ storage: editedStorage }).array('file2', 4),
+    addBannerupload: multer({ storage: addBanner }).single('image'),
+    editBannerupload: multer({ storage: editBanner }).single('image1'),
 
 }

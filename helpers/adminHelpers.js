@@ -27,16 +27,15 @@ module.exports = {
         });
     });
   },
-  blockUser: (userID) => {
-    console.log(userID);
-    return new Promise(async (resolve, reject) => {
-      await user.user
+
+  blockUser: async (userID) => {
+    try {
+      return await user.user
         .updateOne({ _id: userID }, { $set: { blocked: true } })
-        .then((data) => {
-          console.log("Data updated");
-          resolve();
-        });
-    });
+    }
+    catch (err) {
+      return err
+    }
   },
   addCategory: (data) => {
     let response = {};
@@ -237,25 +236,22 @@ module.exports = {
     })
 
   },
-  getAllOrders:()=>
-  {
+  getAllOrders: () => {
     return new Promise(async (resolve, reject) => {
       let order = await user.order.aggregate([
-        {$unwind: '$orders'},
+        { $unwind: '$orders' },
 
       ]).then((response) => {
         resolve(response)
       })
-     
+
     })
   },
 
-  getOrderByDate:()=>
-  {
-     return new Promise(async (resolve, reject) => {
+  getOrderByDate: () => {
+    return new Promise(async (resolve, reject) => {
       const startDate = new Date('2022-01-01');
-      await user.order.find({createdAt:{ $gte: startDate}}).then((response)=>
-      {
+      await user.order.find({ createdAt: { $gte: startDate } }).then((response) => {
         console.log(response);
         resolve(response)
 
@@ -264,13 +260,11 @@ module.exports = {
   },
 
 
-  getAllProducts:()=>
-  {
-    return new Promise(async(resolve, reject) => {
-      await user.product.find().then((response)=>
-      {
+  getAllProducts: () => {
+    return new Promise(async (resolve, reject) => {
+      await user.product.find().then((response) => {
         resolve(response)
-      }) 
+      })
     })
   },
   changeOrderStatus: (orderId, data) => {
@@ -389,30 +383,194 @@ module.exports = {
     })
   },
 
-  totalUserCount:()=>{
+  totalUserCount: () => {
 
-  return new Promise(async(resolve, reject) => {
-    let response=await user.user.find().exec()
-      
-    resolve(response)
-  
-  })
+    return new Promise(async (resolve, reject) => {
+      let response = await user.user.find().exec()
+
+      resolve(response)
+
+    })
   },
 
-  getSalesReport:async ()=>
-{
-  return new Promise(async (resolve, reject) => {
-    let response = await user.order.aggregate([
-      {
-        $unwind: "$orders"
-      },
-      {
-        $match: {
-          "orders.orderStatus": "Delivered"
+  getSalesReport: async () => {
+    return new Promise(async (resolve, reject) => {
+      let response = await user.order.aggregate([
+        {
+          $unwind: "$orders"
+        },
+        {
+          $match: {
+            "orders.orderStatus": "Delivered"
+          }
+        },
+      ])
+      resolve(response)
+    })
+  },
+
+  gettotalamount: () => {
+    return new Promise(async (resolve, reject) => {
+
+
+      await user.order.aggregate([
+
+        {
+          $unwind: '$orders'
+        },
+        {
+          $match: {
+            "orders.orderStatus": "Delivered"
+          }
+        },
+        {
+          $project: {
+            productDetails: '$orders.productDetails',
+
+          }
+
+        },
+        {
+          $unwind: '$productDetails'
+        },
+
+        {
+          $project: {
+            price: '$productDetails.productsPrice',
+            quantity: '$productDetails.quantity'
+          }
+        },
+
+
+        // {
+        //   $lookup: {
+        //     from: 'products',
+        //     localField: "item",
+        //     foreignField: "_id",
+        //     as: 'carted'
+        //   }
+        // },
+        // {
+        //   $project: {
+        //     item: 1, quantity: 1, product: { $arrayElemAt: ['$carted', 0] }
+        //   }
+
+        // },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: { $multiply: ["$price", "$quantity"] } }
+          }
         }
-      },
-    ])
-    resolve(response)
-  })
-}
+      ]).then((total) => {
+
+
+        resolve(total[0].total)
+        console.log(total[0].total, '------------------------------');
+
+
+      })
+
+    })
+
+  },
+  getTotalAmount: (date) => {
+    let start = new Date(date.startdate);
+    let end = new Date(date.enddate);
+    return new Promise(async (resolve, reject) => {
+
+
+      await user.order.aggregate([
+
+        {
+          $unwind: '$orders'
+        },
+        {
+          $match: {
+            $and: [
+              { "orders.orderStatus": "Delivered" },
+              { "orders.createdAt": { $gte: start, $lte: end } }
+
+            ]
+          }
+        },
+        {
+          $project: {
+            productDetails: '$orders.productDetails',
+
+          }
+
+        },
+        {
+          $unwind: '$productDetails'
+        },
+
+        {
+          $project: {
+            price: '$productDetails.productsPrice',
+            quantity: '$productDetails.quantity'
+          }
+        },
+
+
+        // {
+        //   $lookup: {
+        //     from: 'products',
+        //     localField: "item",
+        //     foreignField: "_id",
+        //     as: 'carted'
+        //   }
+        // },
+        // {
+        //   $project: {
+        //     item: 1, quantity: 1, product: { $arrayElemAt: ['$carted', 0] }
+        //   }
+
+        // },
+        {
+          $group: {
+            _id: 0,
+            total: { $sum: { $multiply: ["$price", "$quantity"] } }
+          }
+        }
+      ]).then((total) => {
+
+
+        resolve(total[0].total)
+        // console.log(total[0].total[0], '------------------------------');
+
+
+      })
+
+    })
+
+  },
+  postReport: (date) => {
+    let start = new Date(date.startdate);
+    let end = new Date(date.enddate);
+
+    return new Promise(async (resolve, reject) => {
+      await user.order.aggregate([
+        {
+          $unwind: "$orders",
+        },
+        {
+          $match: {
+            $and: [
+              { "orders.orderStatus": "Delivered" },
+              { "orders.createdAt": { $gte: start, $lte: end } }
+
+            ]
+          }
+        }
+      ])
+        .exec()
+        .then((response) => {
+          console.log(response);
+          resolve(response)
+        })
+    })
+
+  },
+  //Sales
 };

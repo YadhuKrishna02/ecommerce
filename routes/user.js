@@ -11,17 +11,21 @@ router.get("/login", middleware.userSession, controllers.getUserLogin);
 
 router.post("/login", controllers.postUserLogin);
 
-router.get("/reset_password",middleware.userSession,controllers.getPasswordReset)
+router.get('/update_password', controllers.getUpdatePassword)
 
-router.post("/reset_password/:id",middleware.userSession,controllers.postPasswordReset)
+router.post('/update_password', controllers.postUpdatePassword)
 
-router.get("/enter_new_pwd/",middleware.userSession,controllers.getEnterNewPwd)
+router.get("/reset_password", middleware.userSession, controllers.getPasswordReset)
 
-router.put("/enter_new_pwd/:id",middleware.userSession,controllers.updatePassword)
+router.post("/reset_password/:id", middleware.userSession, controllers.postPasswordReset)
 
-router.get("/profile/:id",middleware.userSession,controllers.getProfilePage);
+router.get("/enter_new_pwd", middleware.userSession, controllers.getEnterNewPwd)
 
-router.put("/profile/:id",controllers.changeProfile);
+router.post("/enter_new_pwd/:id", middleware.userSession, controllers.updatePassword)
+
+router.get("/profile/:id", middleware.userSession, controllers.getProfilePage);
+
+router.put("/profile/:id", controllers.changeProfile);
 
 
 
@@ -43,11 +47,11 @@ router.get("/logout", middleware.userSession, controllers.getLogout);
 
 //Wishlist starts here
 
-router.get("/add_to_wishlist/:prodId",middleware.userSession,controllers.getWishlist);
+router.get("/add_to_wishlist/:prodId", middleware.userSession, controllers.getWishlist);
 
-router.get('/view_wishlist',middleware.userSession,controllers.viewWishlist);
+router.get('/view_wishlist', middleware.userSession, controllers.viewWishlist);
 
-router.delete('/delete_wishlist',middleware.userSession,controllers.deleteWishList)
+router.delete('/delete_wishlist', middleware.userSession, controllers.deleteWishList)
 
 
 
@@ -80,27 +84,31 @@ router.delete(
 
 router.get("/check_out", middleware.userSession, controllers.checkOutPage);
 
-router.post("/check_out",middleware.userSession,controllers.postcheckOutPage)
+router.post("/check_out", middleware.userSession, controllers.postcheckOutPage)
 
-router.post("/create_order",controllers.paypalOrder)
+router.post("/create_order", controllers.paypalOrder)
 
-router.get('/paypal_success',middleware.userSession,controllers.paypalSuccess)
+router.get('/paypal_success', middleware.userSession, controllers.paypalSuccess)
 
-router.post('/verify_payment',middleware.userSession,controllers.postVerifyPayment)
+router.post('/verify_payment', middleware.userSession, controllers.postVerifyPayment)
 
-router.get('/order',middleware.userSession,controllers.getOrderPage)
+router.get('/order', middleware.userSession, controllers.getOrderPage)
 
-router.put('/cancel_order',middleware.userSession,controllers.getCancelOrder)
+router.put('/cancel_order', middleware.userSession, controllers.getCancelOrder)
 
-router.put('/return_order',middleware.userSession,controllers.getReturnOrder)
+router.put('/return_order', middleware.userSession, controllers.getReturnOrder)
 
-router.get('/order_details',middleware.userSession,controllers.orderDetails)
+router.get('/order_details', middleware.userSession, controllers.orderDetails)
 
-router.get("/add_address",middleware.userSession,controllers.getAddresspage)
+router.get("/add_address", middleware.userSession, controllers.getAddresspage)
 
-router.post('/add_address',middleware.userSession,controllers.postAddresspage)
+router.post('/add_address', middleware.userSession, controllers.postAddresspage)
 
-router.get('/order_success',middleware.userSession,controllers.getSuccessPage)
+router.get('/view_address', controllers.getViewAddress)
+
+router.delete('/delete_address', controllers.deleteAddress)
+
+router.get('/order_success', middleware.userSession, controllers.getSuccessPage)
 
 //************************************************************ */
 //**********COUPON STARTS HERE************** */
@@ -121,7 +129,9 @@ router.get("/coupon_verify", middleware.userSession, controllers.couponVerify);
 //**********SEARCH PRODUCT***************/
 //************************************************************ */
 
-router.post('/search_product',middleware.userSession, controllers.searchProduct)
+router.post('/search', middleware.userSession, controllers.getSearch)
+
+router.post('/sort', middleware.userSession, controllers.postSort)
 
 router.get('/category', middleware.userSession, controllers.category)
 

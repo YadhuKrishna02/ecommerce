@@ -8,7 +8,7 @@ const adminCredential = {
   email: "admin@gmail.com",
   password: "admin123",
 };
-let adminStatus;
+let adminStatus, getDate;
 let viewCategory;
 module.exports = {
   getAdminLogin: (req, res) => {
@@ -39,74 +39,71 @@ module.exports = {
     }
   },
 
-  
 
-  getDashboard: async(req, res) =>{
-    
- 
+
+  getDashboard: async (req, res) => {
+
+
     let letiable = req.session.admin;
 
-    let totalProducts, days=[]
+    let totalProducts, days = []
     let ordersPerDay = {};
-   let paymentCount=[]
-  
-   await adminHelper.getAllProducts().then((Products)=>
-    {
-    
+    let paymentCount = []
+
+    await adminHelper.getAllProducts().then((Products) => {
+
       totalProducts = Products.length
     })
-    let orderByCod=  await adminHelper.getCodCount()
- 
-    let codCount=orderByCod.length
- 
-    let orderByOnline= await adminHelper.getOnlineCount()
-    let totalUser= await adminHelper.totalUserCount()
- 
-    let totalUserCount=totalUser.length
- 
-    let onlineCount=orderByOnline.length;
- 
-   
+    let orderByCod = await adminHelper.getCodCount()
+
+    let codCount = orderByCod.length
+
+    let orderByOnline = await adminHelper.getOnlineCount()
+    let totalUser = await adminHelper.totalUserCount()
+
+    let totalUserCount = totalUser.length
+
+    let onlineCount = orderByOnline.length;
+
+
     paymentCount.push(onlineCount)
     paymentCount.push(codCount)
-   await adminHelper.getOrderByDate().then((response)=>
-    {
+    await adminHelper.getOrderByDate().then((response) => {
       let result = response[0].orders
       for (let i = 0; i < result.length; i++) {
-        let ans={}
-        ans['createdAt']=result[i].createdAt
+        let ans = {}
+        ans['createdAt'] = result[i].createdAt
         days.push(ans)
-        ans={}
-        
+        ans = {}
+
       }
       console.log(days);
-  
-  
-  days.forEach((order) => {
-    const day = order.createdAt.toLocaleDateString('en-US', { weekday: 'long' });
-    ordersPerDay[day] = (ordersPerDay[day] || 0) + 1;
-  
-  });
-  console.log(ordersPerDay);
-  
+
+
+      days.forEach((order) => {
+        const day = order.createdAt.toLocaleDateString('en-US', { weekday: 'long' });
+        ordersPerDay[day] = (ordersPerDay[day] || 0) + 1;
+
+      });
+      console.log(ordersPerDay);
+
     })
-  
-  
-  await  adminHelper.getAllOrders().then((response)=>
-    {
-  
+
+
+    await adminHelper.getAllOrders().then((response) => {
+
       let length = response.length
-      
+
       let total = 0;
-      
+
       for (let i = 0; i < length; i++) {
         total += response[i].orders.totalPrice;
       }
       console.log(total);
-      res.render("admin/admin-dashboard",{ layout: "adminLayout" ,letiable,adminStatus, length, total, totalProducts,ordersPerDay,paymentCount,totalUserCount});
-  
-    }) 
-   },
+      res.render("admin/admin-dashboard", { layout: "adminLayout", letiable, adminStatus, length, total, totalProducts, ordersPerDay, paymentCount, totalUserCount });
+
+    })
+  },
   getViewUser: (req, res) => {
     adminHelper.getUsers().then((user) => {
       res.render("admin/view-users", {
@@ -119,7 +116,7 @@ module.exports = {
   getBlockUser: (req, res) => {
     adminHelper.blockUser(req.params.id).then((response) => {
       res.redirect("/admin/view_users");
-    });
+    })
   },
   getUnblockUser: (req, res) => {
     adminHelper.UnblockUser(req.params.id).then((response) => {
@@ -195,14 +192,16 @@ module.exports = {
     });
   },
   postAddProduct: (req, res) => {
-    adminHelper.AddProduct(req.body, req.file.filename).then((response) => {
+    const image = req.files.map(files => (files.filename))
+    console.log(image);
+    adminHelper.AddProduct(req.body, image).then((response) => {
       res.redirect("/admin/view_product");
     });
   },
   getViewproduct: (req, res) => {
 
 
-    
+
     adminHelper.ViewProduct().then((response) => {
       res.render("admin/view-product", {
         layout: "adminLayout",
@@ -292,9 +291,8 @@ module.exports = {
       let day = orderDate.getDate();
       let month = orderDate.getMonth() + 1;
       let year = orderDate.getFullYear();
-      return `${isNaN(day) ? "00" : day}-${isNaN(month) ? "00" : month}-${
-        isNaN(year) ? "0000" : year
-      }`;
+      return `${isNaN(day) ? "00" : day}-${isNaN(month) ? "00" : month}-${isNaN(year) ? "0000" : year
+        }`;
     };
     console.log(coupon);
     res.render("admin/coupon", {
@@ -325,7 +323,7 @@ module.exports = {
         return `${isNaN(day) ? "00" : day}-${isNaN(month) ? "00" : month}-${isNaN(year) ? "0000" : year
           } ${date.getHours(hours)}:${date.getMinutes(minutes)}:${date.getSeconds(seconds)}`;
       };
-      res.render('admin/order-list', { layout: 'adminLayout',adminStatus, response, getDate })
+      res.render('admin/order-list', { layout: 'adminLayout', adminStatus, response, getDate })
     })
   },
   getOrderDetails: (req, res) => {
@@ -342,26 +340,26 @@ module.exports = {
         return `${isNaN(day) ? "00" : day}-${isNaN(month) ? "00" : month}-${isNaN(year) ? "0000" : year
           } ${date.getHours(hours)}:${date.getMinutes(minutes)}:${date.getSeconds(seconds)}`;
       };
-       
+
       let products = order.orders[0].productDetails
       let total = order.orders
-      res.render('admin/order-details', { layout: 'adminLayout',adminStatus, order, products, total, getDate })
+      res.render('admin/order-details', { layout: 'adminLayout', adminStatus, order, products, total, getDate })
     })
 
   },
-  postOrderDetails:(req,res)=>{
+  postOrderDetails: (req, res) => {
     console.log(typeof req.query.orderId);
-   console.log(req.body);
     console.log(req.body);
-    adminHelper.changeOrderStatus(req.query.orderId,req.body).then((response)=>{
-             res.redirect('/admin/orders_list')
+    console.log(req.body);
+    adminHelper.changeOrderStatus(req.query.orderId, req.body).then((response) => {
+      res.redirect('/admin/orders_list')
     })
 
   },
 
   getAddBanner: (req, res) => {
 
-    res.render('admin/add-banner', { layout: 'adminLayout' })
+    res.render('admin/add-banner', { layout: 'adminLayout', adminStatus })
   },
   postAddBanner: (req, res) => {
 
@@ -378,9 +376,9 @@ module.exports = {
 
     adminHelper.listBanner().then((response) => {
 
-      let admins=req.session.admin
 
-      res.render('admin/list-banner', { layout: 'adminLayout', response ,admins})
+
+      res.render('admin/list-banner', { layout: 'adminLayout', response, adminStatus })
 
     })
 
@@ -392,8 +390,8 @@ module.exports = {
   getEditBanner: (req, res) => {
 
     adminHelper.editBanner(req.query.banner).then((response) => {
-     
-      res.render('admin/edit-banner', { layout: 'adminLayout', response })
+
+      res.render('admin/edit-banner', { layout: 'adminLayout', response, adminStatus })
 
     })
 
@@ -404,23 +402,50 @@ module.exports = {
 
   postEditBanner: (req, res) => {
 
-    adminHelper.postEditBanner(req.query.editbanner, req.body,req.file.filename).then((response) => {
- res.redirect('/admin/list_banner')
+    adminHelper.postEditBanner(req.query.editbanner, req.body, req?.file?.filename).then((response) => {
+      res.redirect('/admin/list_banner')
 
     })
   },
 
-  getSalesReport:async (req, res)=>
-  {
+  getSalesReport: async (req, res) => {
+    getDate = (date) => {
+      let orderDate = new Date(date);
+      let day = orderDate.getDate();
+      let month = orderDate.getMonth() + 1;
+      let year = orderDate.getFullYear();
+      let hours = date.getHours();
+      let minutes = date.getMinutes();
+      let seconds = date.getSeconds();
+      return `${isNaN(day) ? "00" : day}-${isNaN(month) ? "00" : month}-${isNaN(year) ? "0000" : year
+        } ${date.getHours(hours)}:${date.getMinutes(minutes)}:${date.getSeconds(seconds)}`;
+    };
     let report = await adminHelper.getSalesReport()
+    let total = await adminHelper.gettotalamount()
+    console.log(total);
     let Details = []
-    
-    report.forEach(orders => {Details.push( orders.orders)})
+    report.forEach(orders => { Details.push(orders.orders) })
     // report.forEach(orders => {userdata.push( orders.orders.shippingAddress)})
 
-    console.log(Details);
 
-    res.render('admin/sales-report',{layout: "adminLayout",adminStatus,Details})
+    res.render('admin/sales-report', { layout: "adminLayout", adminStatus, Details, getDate, total })
+
+
+  },
+
+  postSalesReport: async (req, res) => {
+
+    let Details = [];
+    let total = await adminHelper.getTotalAmount(req.body)
+
+
+    adminHelper.postReport(req.body).then((orderdata) => {
+
+      orderdata.forEach(orders => { Details.push(orders.orders) })
+
+
+      res.render('admin/sales-report', { layout: "adminLayout", adminStatus, Details, getDate, total })
+    })
 
 
   }

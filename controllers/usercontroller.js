@@ -1,41 +1,41 @@
 require('dotenv').config()
 const userhelpers = require("../helpers/userhelpers");
 const couponHelpers = require("../helpers/couponHelpers");
+const adminHelper = require("../helpers/adminHelpers");
 const user = require("../models/connection");
 const otp = require("../otp/otp");
 const ObjectId = require("mongodb").ObjectId;
-const adminHelper = require("../helpers/adminHelpers");
 const { response } = require("../app");
 const { wishlist } = require("../models/connection");
 const { Convert } = require("easy-currencies");
 const paypal = require('@paypal/checkout-server-sdk')
 const Environment =
-    process.env.NODE_ENV === "production"
-        ? paypal.core.LiveEnvironment
-        : paypal.core.SandboxEnvironment
+  process.env.NODE_ENV === "production"
+    ? paypal.core.LiveEnvironment
+    : paypal.core.SandboxEnvironment
 const paypalClient = new paypal.core.PayPalHttpClient(
-    new Environment(
-        process.env.PAYPAL_CLIENT_ID,
-        process.env.PAYPAL_CLIENT_SECRET
-    )
+  new Environment(
+    process.env.PAYPAL_CLIENT_ID,
+    process.env.PAYPAL_CLIENT_SECRET
+  )
 )
 
 const client = require("twilio")(otp.accountId, otp.authToken);
 
-let userSession, number, loggedUser,profileId,userDetails,userAddDetails,getDate;
-let count,wishcount,
-  otpNumber,total
-  couponPrice = 0;
+let userSession, number, loggedUser, profileId, userDetails, userAddDetails, getDate;
+let count, wishcount,
+  otpNumber, total
+couponPrice = 0;
 
 module.exports = {
   getHome: async (req, res) => {
     userSession = req.session.userLoggedIn;
     if (req.session.userLoggedIn) {
-      profileId=req.session.user.id;
+      profileId = req.session.user.id;
       count = await userhelpers.getCartItemsCount(req.session.user.id);
-      res.render("user/user", { userSession,profileId, count });
+      res.render("user/user", { userSession, wishcount, profileId, count });
     } else {
-      res.render("user/user", { userSession,profileId });
+      res.render("user/user", { userSession, wishcount, profileId });
     }
   },
   getUserLogin: async (req, res) => {
@@ -43,10 +43,10 @@ module.exports = {
 
     userSession = req.session.userLoggedIn;
 
-    res.render("user/user", { userSession, count,profileId });
+    res.render("user/user", { userSession, wishcount, count, profileId });
   },
   getUserOtpLogin: (req, res) => {
-    res.render("user/otplogin", { userSession,profileId });
+    res.render("user/otplogin", { userSession, profileId });
   },
   postUserOtpLogin: async (req, res) => {
     number = req.body.number;
@@ -69,15 +69,15 @@ module.exports = {
     }
   },
 
-  postOtpVerify: async(req, res) => {
+  postOtpVerify: async (req, res) => {
     otpNumber = req.body.otp;
 
     const newOTP = new user.otp({
       otp: otpNumber,
       phoneNumber: number
-  });
+    });
 
-  await newOTP.save();
+    await newOTP.save();
 
     client.verify.v2
       .services(otp.serviceId)
@@ -96,7 +96,7 @@ module.exports = {
           //   req.session.user = user[0]._id;
           //   userSession = req.session.user;
           // });
-          res.render("user/user", { userSession,countdown:60 });
+          res.render("user/user", { userSession, countdown: 60 });
         } else {
           res.redirect("/otp_verify");
         }
@@ -126,7 +126,7 @@ module.exports = {
   },
   postSignUp: (req, res) => {
     userhelpers.doSignUp(req.body).then((response) => {
-    let emailStatus = response.emailStatus;
+      let emailStatus = response.emailStatus;
       if (emailStatus == false) {
         res.redirect("/login");
       } else {
@@ -135,38 +135,57 @@ module.exports = {
     });
   },
 
-  getPasswordReset:(req,res)=>{
-      res.render("user/reset-password",{userSession,profileId})
+  getUpdatePassword: (req, res) => {
+    res.render("user/update-password");
   },
-  postPasswordReset:async(req,res)=>{
-   let response=await userhelpers.verifyEmail(req.body)
-      res.json(response.status)
-  },
-  getEnterNewPwd:(req,res)=>{
-    res.render("user/enter-pwd",{userSession,profileId})
-    
-  },
-  updatePassword:async(req,res)=>{
 
-    let passResponse=await userhelpers.verifyPassword(req.body,req.params.id);
-    if(passResponse){
+  postUpdatePassword: (req, res) => {
+    userhelpers.doUpdatePassword(req.body).then((response) => {
+      if (response.update) {
+        res.redirect("/login");
+      } else {
+        res.render("user/update-password", { updateStaus: true });
+      }
+    });
+  },
+  getPasswordReset: (req, res) => {
+    res.render("user/reset-password", { userSession, profileId })
+  },
+  postPasswordReset: async (req, res) => {
+    let response = await userhelpers.verifyEmail(req.body)
+    res.json(response.status)
+  },
+  getEnterNewPwd: (req, res) => {
+    res.render("user/enter-pwd", { userSession, profileId })
+
+  },
+  updatePassword: async (req, res) => {
+
+    console.log(req.params.id, '------------------------');
+    console.log(req.body);
+    let passResponse = await userhelpers.verifyPassword(req.body, req.params.id);
+    if (passResponse) {
       res.json(true)
+    }
+    else {
+      res.json(false);
+
     }
 
   },
 
 
-  getProfilePage:(req,res)=>{
-    
-     userhelpers.getUserdetails(profileId).then((response)=>{
-      userAddDetails=response.Address;
+  getProfilePage: (req, res) => {
 
-       res.render("user/profile",{userSession,profileId,count,userAddDetails})
-     })
-          
+    userhelpers.getUserdetails(profileId).then((response) => {
+      userAddDetails = response.Address;
+
+      res.render("user/profile", { userSession, wishcount, profileId, count, userAddDetails })
+    })
+
   },
 
-  changeProfile:(req,res)=>{
+  changeProfile: (req, res) => {
     userhelpers.changeProfile(profileId, req.body)
       .then((response) => {
         res.json(true)
@@ -174,28 +193,29 @@ module.exports = {
   },
 
   getShop: async (req, res) => {
-    let pageNum=req.query.page 
-    let currentPage=pageNum
-    let perPage=6
+    let pageNum = req.query.page
+    let currentPage = pageNum
+    let perPage = 6
     // let currentUserId=req.session.user.id
 
     count = await userhelpers.getCartItemsCount(req.session.user.id)
     viewCategory = await adminHelper.viewAddCategory()
-    documentCount=  await userhelpers.documentCount()
-    let pages=Math.ceil(parseInt(documentCount) /perPage)
+    documentCount = await userhelpers.documentCount()
+    let pages = Math.ceil(parseInt(documentCount) / perPage)
 
     userhelpers.shopListProduct(pageNum).then((response) => {
-      
-      res.render('user/shop', { response,profileId, userSession, count, viewCategory ,currentPage,documentCount,pages})
+
+      res.render('user/shop', { response, profileId, wishcount, userSession, count, viewCategory, currentPage, documentCount, pages })
     })
 
 
   },
   getProductDetails: async (req, res) => {
     count = await userhelpers.getCartItemsCount(req.session.user.id);
+    console.log(count);
 
     userhelpers.productDetails(req.params.id).then((data) => {
-      res.render("user/eachproduct", { userSession,profileId, data, count });
+      res.render("user/eachproduct", { userSession, profileId, data, count, wishcount });
     });
   },
 
@@ -204,48 +224,40 @@ module.exports = {
       res.json({ status: true });
     });
   },
-  getWishlist: async(req, res) => {
-     wishcount = await userhelpers.getWishCount(profileId)
+  getWishlist: async (req, res) => {
+    wishcount = await userhelpers.getWishCount(profileId)
     userhelpers.addToWishlist(req.params.prodId, req.session.user.id).then((data) => {
       res.json({ status: true });
     });
   },
 
-  viewWishlist:async(req,res)=>{
+  viewWishlist: async (req, res) => {
 
     let wishlistItems = await userhelpers.viewWishlist(req.session.user.id);
-    res.render("user/wishlist",{userSession,profileId,count,wishlistItems,wishcount})
+    res.render("user/wishlist", { userSession, profileId, count, wishlistItems, wishcount })
   },
-  deleteWishList: (body) => {
+  deleteWishList: (req, res) => {
+    userhelpers.getDeleteWishList(req.body).then((response) => {
 
-    return new Promise(async (resolve, reject) => {
+      res.json(response)
 
-      let product = await user.wishlist.updateOne({ _id:body.wishlistId },
-        {
-          "$pull":
-
-            { wishlistItems: { productId: body.productId} }
-        }).then(() => {
-          resolve({ removeProduct: true })
-        })
-
-      
     })
   },
 
   getViewCart: async (req, res) => {
     let userId = req.session.user;
-     total = await userhelpers.totalCheckOutAmount(req.session.user.id);
+    total = await userhelpers.totalCheckOutAmount(req.session.user.id);
     let count = await userhelpers.getCartItemsCount(req.session.user.id);
 
     let cartItems = await userhelpers.viewCart(req.session.user.id);
+    console.log(cartItems);
 
     res.render("user/view-cart", {
       cartItems,
       userId,
       userSession,
       profileId,
-      count,
+      count, wishcount,
       total,
     });
   },
@@ -262,7 +274,7 @@ module.exports = {
       res.json(response);
     });
   },
-  
+
 
   getLogout: (req, res) => {
     req.session.user = null;
@@ -271,16 +283,10 @@ module.exports = {
     res.redirect("/login");
   },
 
-  deleteWishList: (req, res) => {
-    userhelpers.deleteWishList(req.body).then((response)=>{
-    
-      res.json(response)
-    
-    })
-      },
 
-  checkOutPage:async (req, res) => {
-    
+
+  checkOutPage: async (req, res) => {
+
     let users = req.session.user.id
     if (req.session.user.total) {
       total = req.session.user.total
@@ -289,212 +295,228 @@ module.exports = {
 
       total = await userhelpers.totalCheckOutAmount(req.session.user.id)
     }
-    
+
     let count = await userhelpers.getCartItemsCount(req.session.user.id);
-      let cartItems =  await userhelpers.viewCart(req.session.user.id)
-      userhelpers.checkOutpage(req.session.user.id).then((response)=>{
-      
+    let cartItems = await userhelpers.viewCart(req.session.user.id)
+    userhelpers.checkOutpage(req.session.user.id).then((response) => {
 
-        res.render('user/checkout',{paypalClientId: process.env.PAYPAL_CLIENT_ID,users,userSession,profileId,cartItems,total,response,count})
-  })
 
-},
+      res.render('user/checkout', { paypalClientId: process.env.PAYPAL_CLIENT_ID, users, userSession, profileId, cartItems, total, response, wishcount, count })
+    })
 
-postcheckOutPage:async (req, res) => {
+  },
 
-  if (req.session.user.total) {
-    total = req.session.user.total
-  }
-  else {
+  postcheckOutPage: async (req, res) => {
 
-    total = await userhelpers.totalCheckOutAmount(req.session.user.id)
-  }
-  req.session.user.total=null
-  
- let order= await userhelpers.placeOrder(req.body, total).then(async (response) => {
-           
-         
-          
- 
-    if (req.body['payment-method'] == 'COD') {
-      res.json({ codstatus: true })
- 
-    } else if(req.body['payment-method'] == 'online') {
-      userhelpers.generateRazorpay(req.session.user.id, total).then((order) => {
-        res.json(order)
- 
-      })
+    if (req.session.user.total) {
+      total = req.session.user.total
     }
-    else{
-  let value = await Convert(total).from("INR").to("USD");
-  console.log(value);
-  let price = Math.round(value)
-      res.json({ paypal: true, price:price})
+    else {
+
+      total = await userhelpers.totalCheckOutAmount(req.session.user.id)
     }
-  })
- 
- 
- },
+    req.session.user.total = null
 
- paypalOrder: async (req, res) => {
-   let total = req.body.total
-   total = parseInt(total)
-  const request = new paypal.orders.OrdersCreateRequest()
-  
+    let order = await userhelpers.placeOrder(req.body, total).then(async (response) => {
 
-  request.prefer("return=representation")
-  request.requestBody({
+
+
+
+      if (req.body['payment-method'] == 'COD') {
+        res.json({ codstatus: true })
+
+      } else if (req.body['payment-method'] == 'online') {
+        userhelpers.generateRazorpay(req.session.user.id, total).then((order) => {
+          res.json(order)
+
+        })
+      }
+      else {
+        let value = await Convert(total).from("INR").to("USD");
+        console.log(value);
+        let price = Math.round(value)
+        res.json({ paypal: true, price: price })
+      }
+    })
+
+
+  },
+
+  paypalOrder: async (req, res) => {
+    let total = req.body.total
+    total = parseInt(total)
+    const request = new paypal.orders.OrdersCreateRequest()
+
+
+    request.prefer("return=representation")
+    request.requestBody({
       intent: "CAPTURE",
       purchase_units: [
-          {
-              amount: {
-                  currency_code: "USD",
-                  value: total,
-                  breakdown: {
-                      item_total: {
-                          currency_code: "USD",
-                          value: total,
-                      },
-                  },
-              }
-          },
+        {
+          amount: {
+            currency_code: "USD",
+            value: total,
+            breakdown: {
+              item_total: {
+                currency_code: "USD",
+                value: total,
+              },
+            },
+          }
+        },
       ],
-  })
+    })
 
-  try {
+    try {
       const order = await paypalClient.execute(request)
       res.json({ id: order.result.id })
-  } catch (e) {
+    } catch (e) {
       res.status(500).json({ error: e.message })
-  }
-},
-paypalSuccess: async (req, res) => {
-  const ordersDetails = await user.order.find({ userId: profileId })
-  let orders = ordersDetails[0].orders.slice().reverse()
-  let orderId1 = orders[0]._id
-  let orderId = "" + orderId1
+    }
+  },
+  paypalSuccess: async (req, res) => {
+    const ordersDetails = await user.order.find({ userId: profileId })
+    let orders = ordersDetails[0].orders.slice().reverse()
+    let orderId1 = orders[0]._id
+    let orderId = "" + orderId1
 
-  userhelpers.changePaymentStatus(req.session.user, orderId).then(() => {
+    userhelpers.changePaymentStatus(req.session.user, orderId).then(() => {
       res.json({ status: true })
-  })
-},
-
- postVerifyPayment: (req, res) => {
-   userhelpers.verifyPayment(req.body).then(()=>{
-    
-     userhelpers.changePaymentStatus(req.session.user.id,req.body['order[receipt]']).then(()=>{
- 
-       res.json({status:true})
- 
-     }).catch((err)=>{
-  res.json({status:false ,err})
-     })
- 
-   })
- 
-   
- },
- getOrderPage: (req, res) => {
-  const getDate = (date) => {
-    let orderDate = new Date(date);
-    let day = orderDate.getDate();
-    let month = orderDate.getMonth() + 1;
-    let year = orderDate.getFullYear();
-    let hours = date.getHours();
-    let minutes = date.getMinutes();
-    let seconds = date.getSeconds();
-    return `${isNaN(day) ? "00" : day}-${isNaN(month) ? "00" : month}-${isNaN(year) ? "0000" : year
-      } ${date.getHours(hours)}:${date.getMinutes(minutes)}:${date.getSeconds(seconds)}`;
-  };
-  userhelpers.orderPage(req.session.user.id).then((response) => {
-
-    res.render('user/orderslist', { response, userSession,profileId, count, getDate })
-  })
-
-},
- 
-orderDetails: async (req, res) => {
-
-  let orderId = req.query.order
-   getDate = (date) => {
-    let orderDate = new Date(date);
-    let day = orderDate.getDate();
-    let month = orderDate.getMonth() + 1;
-    let year = orderDate.getFullYear();
-   
-    return `${isNaN(day) ? "00" : day}-${isNaN(month) ? "00" : month}-${isNaN(year) ? "0000" : year
-      }`;
-  };
-
-  userhelpers.viewOrderDetails(orderId).then(async(response) => {
-    let products = response.products[0]
-    let address = response.address
-    let orderDetails = response.details
-    let data = userhelpers.createData(response,getDate)
-
-    res.render('user/order-details', { products, address, orderDetails, userSession,profileId, count, getDate,data })
-
-  })
-
-  
-
-},
- 
-
- 
- getAddresspage: async (req, res) => {
- 
-    
- 
-   let count = await userhelpers.getCartItemsCount(req.session.user.id);
- 
- 
-   res.render('user/add-address',{userSession,profileId,count})
- 
- },
- postAddresspage:  (req, res) => {
-          
-     
-   userhelpers.postAddress(req.session.user.id,req.body).then(()=>{
- 
-   
-     res.redirect('/check_out')
-   })
- 
- },
- getCancelOrder: (req, res) => {
-
-  userhelpers.cancelOrder(req.query.orderid, req.session.user.id).then((response) => {
-    res.json(response)
-  })
-
-},
- getReturnOrder: (req, res) => {
-
-  userhelpers.returnOrder(req.query.orderid, req.session.user.id).then((response) => {
-    res.json(response)
-  })
-
-},
-
-
-
-  category: async(req, res) => {
-    viewCategory = await adminHelper.viewAddCategory()
-
-    userhelpers.category(req.query.cname).then((response)=>{
-      
-      res.render('user/filter-category',{ response, userSession,viewCategory,count})
     })
   },
- 
+
+  postVerifyPayment: (req, res) => {
+    userhelpers.verifyPayment(req.body).then(() => {
+
+      userhelpers.changePaymentStatus(req.session.user.id, req.body['order[receipt]']).then(() => {
+
+        res.json({ status: true })
+
+      }).catch((err) => {
+        res.json({ status: false, err })
+      })
+
+    })
+
+
+  },
+  getOrderPage: (req, res) => {
+    const getDate = (date) => {
+      let orderDate = new Date(date);
+      let day = orderDate.getDate();
+      let month = orderDate.getMonth() + 1;
+      let year = orderDate.getFullYear();
+      let hours = date.getHours();
+      let minutes = date.getMinutes();
+      let seconds = date.getSeconds();
+      return `${isNaN(day) ? "00" : day}-${isNaN(month) ? "00" : month}-${isNaN(year) ? "0000" : year
+        } ${date.getHours(hours)}:${date.getMinutes(minutes)}:${date.getSeconds(seconds)}`;
+    };
+    userhelpers.orderPage(req.session.user.id).then((response) => {
+
+      res.render('user/orderslist', { response, userSession, profileId, wishcount, count, getDate })
+    })
+
+  },
+
+  orderDetails: async (req, res) => {
+
+    let orderId = req.query.order
+    getDate = (date) => {
+      let orderDate = new Date(date);
+      let day = orderDate.getDate();
+      let month = orderDate.getMonth() + 1;
+      let year = orderDate.getFullYear();
+
+      return `${isNaN(day) ? "00" : day}-${isNaN(month) ? "00" : month}-${isNaN(year) ? "0000" : year
+        }`;
+    };
+
+    userhelpers.viewOrderDetails(orderId).then(async (response) => {
+      let products = response.products[0]
+      let address = response.address
+      console.log(address);
+      let orderDetails = response.details
+      let data = userhelpers.createData(response, getDate)
+
+      res.render('user/order-details', { products, address, orderDetails, userSession, profileId, wishcount, count, getDate, data })
+
+    })
+
+
+
+  },
+
+
+
+  getAddresspage: async (req, res) => {
+
+
+
+    let count = await userhelpers.getCartItemsCount(req.session.user.id);
+
+
+    res.render('user/add-address', { userSession, profileId, wishcount, count })
+
+  },
+  getViewAddress: (req, res) => {
+    let user = req.session.user.id;
+    let users = req.session.user;
+    userhelpers.getAddress(req.session.user.id).then((response) => {
+      console.log(response);
+      res.render("user/view-address", { response, wishcount, count, user, users });
+    });
+  },
+
+  deleteAddress: (req, res) => {
+    userhelpers.deleteAddress(req.body).then((response) => {
+      console.log(response);
+      res.json(response);
+    });
+  },
+  postAddresspage: (req, res) => {
+
+
+    userhelpers.postAddress(req.session.user.id, req.body).then(() => {
+
+
+      res.redirect('/check_out')
+    })
+
+  },
+  getCancelOrder: (req, res) => {
+
+    userhelpers.cancelOrder(req.query.orderid, req.session.user.id).then((response) => {
+      res.json(response)
+    })
+
+  },
+  getReturnOrder: (req, res) => {
+
+    userhelpers.returnOrder(req.query.orderid, req.session.user.id).then((response) => {
+      res.json(response)
+    })
+
+  },
+
+
+
+  category: async (req, res) => {
+    viewCategory = await adminHelper.viewAddCategory()
+
+    userhelpers.category(req.query.cname).then((response) => {
+
+      res.render('user/shop-new', { response, userSession, viewCategory, wishcount, count })
+    })
+  },
+
   //************************************************************ */
   //**********COUPON STARTS HERE************** */
   //************************************************************ */
 
   applyCoupon: async (req, res) => {
     let code = req.query.code;
-     total = await userhelpers.totalCheckOutAmount(req.session.user);
+    total = await userhelpers.totalCheckOutAmount(req.session.user);
     couponHelpers.applyCoupon(code, total).then((response) => {
       req.session.user.total = response.total
       couponPrice = response.discountAmount ? response.discountAmount : 0;
@@ -520,15 +542,32 @@ orderDetails: async (req, res) => {
   //************************************************************ */
   //**********SEARCH PRODUCT STARTS HERE************** */
   //************************************************************ */
-  searchProduct:async(req,res)=>{
-    let payload=req.body.payload.trim();
-    let search=await user.product.find({ Productname: { $regex:new RegExp('^' +payload+'.*','i')} }).exec();
-    
-    search=search.slice(0,10);
-    res.send({payload:search})
+
+  getSuccessPage: (req, res) => {
+    res.render('user/success')
   },
 
-  getSuccessPage:(req,res)=>{
-    res.render('user/success')
-  }
+  getSearch: async (req, res) => {
+
+    let category = await adminHelper.viewAddCategory()
+
+
+    userhelpers.productSearch(req.body).then((response) => {
+      res.render('user/shop-new', { response, category, wishcount, count })
+      console.log(response);
+    }).catch((err) => {
+      console.log(err);
+      res.render('user/shop-new', { err, category, wishcount, count })
+
+    })
+  },
+
+  postSort: async (req, res) => {
+    console.log(req.body);
+    let sortOption = req.body['selectedValue'];
+    let category = await adminHelper.viewAddCategory()
+    userhelpers.postSort(sortOption).then((response) => {
+      res.render('user/shop-new', { response, category, count, wishcount })
+    })
+  },
 };

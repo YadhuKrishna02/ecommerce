@@ -34,7 +34,7 @@
 
               </div>
               <div class="mb-3 d-grid">
-                <button onclick=" return validateForm(); newPassword('<%=locals.profileId%>');" class="btn btn-primary">Click me</button>
+                <button onclick="newPassword('<%=locals.profileId%>');" class="btn btn-primary">Click me</button>
                   Reset Password
                 </button>
               </div>
@@ -52,14 +52,27 @@
 
         $.ajax({
         url: `/enter_new_pwd/${profileId}`,
-        method: "PUT",
+        method: "POST",
         data:$('#update').serialize(),
         success: (response) => {
-          if(response){
-            
-            location.href=`/profile/${profileId}`
+            if(response){
+                Swal.fire({
+  position: 'center',
+  icon: 'success',
+  title: 'Your password has been updated',
+  showConfirmButton: false,
+  timer: 1500
+})
+// location.href="/profile"
+            }
+            else{
+                Swal.fire({
+  icon: 'error',
+  title: 'Enter old password correctly!!',
+  
+})
+            }
           }
-        },
         });
     })
 

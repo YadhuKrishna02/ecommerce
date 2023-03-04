@@ -7,7 +7,7 @@ const { Convert } = require("easy-currencies");
 const otp = require("../otp/otp");
 const Razorpay = require('razorpay');
 const razorpay = require('../otp/razorpay');
-const {  wishlist } = require("../models/connection");
+const { wishlist } = require("../models/connection");
 const { resolve } = require("path");
 const { editeduploads } = require("../multer/multer");
 let instance = new Razorpay({
@@ -74,72 +74,103 @@ module.exports = {
     });
   },
 
-  verifyEmail:(userData)=>{
+  verifyEmail: (userData) => {
 
-    return new Promise(async(resolve, reject) => {
-      let email=await user.user.findOne({email:userData.email})
+    return new Promise(async (resolve, reject) => {
+      let email = await user.user.findOne({ email: userData.email })
       console.log(email);
-      if(email){
-        resolve({status:true})
+      if (email) {
+        resolve({ status: true })
       }
-      else{
-        resolve({status:false})
+      else {
+        resolve({ status: false })
       }
     })
 
-   
-  },
-  verifyPassword:(userData,userId)=>{
 
-    return new Promise(async(resolve, reject) => {
-      let users=await user.user.findOne({_id:userId})
+  },
+  verifyPassword: (userData, userId) => {
+
+    return new Promise(async (resolve, reject) => {
+      let users = await user.user.findOne({ _id: userId })
       console.log(users);
       await bcrypt
-      .compare(userData.password, users.Password)
-      .then(async (status) => {
-        if(status){
-          let hashedPassword = await bcrypt.hash(userData.password2, 10);
-          await user.user.updateOne(
-            {_id:userId},
-            {$set:{
-              Password:hashedPassword
-            }}
-            ).then((response)=>{
+        .compare(userData.password, users.Password)
+        .then(async (status) => {
+          if (status) {
+            let hashedPassword = await bcrypt.hash(userData.password2, 10);
+            await user.user.updateOne(
+              { _id: userId },
+              {
+                $set: {
+                  Password: hashedPassword
+                }
+              }
+            ).then((response) => {
               console.log(response);
               resolve(response)
+            }).catch((err) => {
+              console.log(err);
             })
 
-        }
-      });
+          }
+          else {
+            resolve(false)
+          }
+        });
     })
 
-   
+
+  },
+
+  doUpdatePassword: (body) => {
+    console.log(body);
+    return new Promise(async (resolve, reject) => {
+      let users = await user.user.findOne({ email: body.email });
+
+      if (users) {
+        let hashedPassword = await bcrypt.hash(body.password, 10);
+
+        let change = await user.user
+          .updateOne(
+            { email: body.email },
+            { $set: { Password: hashedPassword } }
+          )
+          .then((result) => {
+            console.log(result);
+            resolve({ update: true });
+          });
+      } else {
+        resolve({ update: false });
+      }
+    });
   },
 
 
-  documentCount:()=>{
-    return new Promise(async(resolve, reject) => {
+  documentCount: () => {
+    return new Promise(async (resolve, reject) => {
       await user.product.find().countDocuments().then((documents) => {
-        
+
         resolve(documents);
+      })
     })
-    })},
+  },
 
   shopListProduct: (pageNum) => {
-     
-     let perPage=6
-     return new Promise(async (resolve, reject) => {
-      
-       
-         
-        await user.product.find().skip((pageNum-1)*perPage).limit(perPage).then((response)=>{
-         
-           resolve(response)
-         })
-         
-       
-     })
-   },
+
+    let perPage = 6
+    return new Promise(async (resolve, reject) => {
+
+
+
+      await user.product.find().skip((pageNum - 1) * perPage).limit(perPage).then((response) => {
+
+        resolve(response)
+      })
+
+
+    })
+  },
   productDetails: (proId) => {
     return new Promise(async (resolve, reject) => {
       await user.product.find({ _id: proId }).then((response) => {
@@ -148,29 +179,29 @@ module.exports = {
     });
   },
 
-  getUserdetails:(profileId)=>{
+  getUserdetails: (profileId) => {
     return new Promise(async (resolve, reject) => {
       user.address
-        .findOne({userid:profileId})
+        .findOne({ userid: profileId })
         .then((response) => {
           resolve(response);
         });
     });
   },
 
-  changeProfile:(profileId,editedData)=>{
+  changeProfile: (profileId, editedData) => {
 
     return new Promise(async (resolve, reject) => {
-       user.address.
+      user.address.
         updateOne(
-          { userid: profileId},
+          { userid: profileId },
           {
             $set: {
-              "Address.0.fname":editedData.fname,
-              "Address.0.lname":editedData.lname,
-              "Address.0.email":editedData.email,
-              "Address.0.mobile":parseInt(editedData.phone),
-              "Address.0.street":editedData.address
+              "Address.0.fname": editedData.fname,
+              "Address.0.lname": editedData.lname,
+              "Address.0.email": editedData.email,
+              "Address.0.mobile": parseInt(editedData.phone),
+              "Address.0.street": editedData.address
 
             },
           }
@@ -181,8 +212,8 @@ module.exports = {
     });
   },
   //WISHLIST
-  addToWishlist: async(proId, userId) => {
-    
+  addToWishlist: async (proId, userId) => {
+
     const proObj = {
       productId: proId
     };
@@ -193,47 +224,47 @@ module.exports = {
         let productExist = wishlist.wishlistItems.findIndex(
           (item) => item.productId == proId
         );
-         if(productExist==-1){
+        if (productExist == -1) {
           user.wishlist
-          .updateOne(
-            { user: userId},
-            {
-              $addToSet:{
-                wishlistItems:proObj
-              },
-            }
-          )
-          .then(() => {
-            resolve();
-          });
-         }
-        
+            .updateOne(
+              { user: userId },
+              {
+                $addToSet: {
+                  wishlistItems: proObj
+                },
+              }
+            )
+            .then(() => {
+              resolve();
+            });
+        }
+
       } else {
         const newWishlist = new user.wishlist({
           user: userId,
-          wishlistItems:proObj
+          wishlistItems: proObj
         });
-      
+
         await newWishlist.save().then((data) => {
           resolve(data);
         });
       }
     });
   },
-  
+
   getWishCount: (userId) => {
-    console.log('api called');
     return new Promise(async (resolve, reject) => {
       let count = 0;
       let wishlist = await user.wishlist.findOne({ user: userId })
       if (wishlist) {
         count = wishlist.wishlistItems.length
       }
+
       resolve(count)
 
     })
   },
-    
+
 
 
   addToCart: (proId, userId) => {
@@ -468,42 +499,58 @@ module.exports = {
     });
   },
 
-  getCardProdctList:(userId)=>{
-    return new Promise(async(resolve, reject) => {
-     
-      
-          let id = user.cart.aggregate([
-      
-            {
-              $match: {
-                user:ObjectId(userId)
-              }
-            },
-            {
-             $unwind: '$cartItems'
-            },
-                
-          {
-              $project: {
-                  item: '$cartItems.productId',
-                _id:0
-              }
-          },
-      
-          ]).then((result)=>
-          {
-            resolve(result)
-          })
-         
+  getDeleteWishList: (body) => {
+
+    return new Promise(async (resolve, reject) => {
+
+      await user.wishlist.updateOne({ _id: body.wishlistId },
+        {
+          "$pull":
+
+            { wishlistItems: { productId: body.productId } }
+        }).then(() => {
+          resolve({ removeProduct: true })
         })
-      
-    
-  
+
+
+    })
+  },
+
+  getCardProdctList: (userId) => {
+    return new Promise(async (resolve, reject) => {
+
+
+      let id = user.cart.aggregate([
+
+        {
+          $match: {
+            user: ObjectId(userId)
+          }
+        },
+        {
+          $unwind: '$cartItems'
+        },
+
+        {
+          $project: {
+            item: '$cartItems.productId',
+            _id: 0
+          }
+        },
+
+      ]).then((result) => {
+        resolve(result)
+      })
+
+    })
+
+
+
 
   },
-  category:(categoryName)=>{
+  category: (categoryName) => {
     return new Promise(async (resolve, reject) => {
-      await user.product.find({category:categoryName}).then((response)=>{
+      await user.product.find({ category: categoryName }).then((response) => {
         resolve(response)
       })
     })
@@ -538,6 +585,7 @@ module.exports = {
 
       ]).then((address) => {
 
+        console.log(address);
 
         resolve(address)
       })
@@ -548,6 +596,7 @@ module.exports = {
   placeOrder: (orderData, total) => {
     return new Promise(async (resolve, reject) => {
 
+      console.log(orderData);
       let productdetails = await user.cart.aggregate([
         {
           $match: {
@@ -590,42 +639,34 @@ module.exports = {
           }
         }
       ])
-   
-   let address= await user.address.aggregate([
-        {
-          $match: {
-            userid: ObjectId(orderData.user)
-          }
-        },
-        {
-          $unwind: '$Address'
-        },
+
+      let Address = await user.address.aggregate([
+        { $match: { userid: ObjectId(orderData.user) } },
+
+        { $unwind: "$Address" },
+
+        { $match: { "Address._id": ObjectId(orderData.address) } },
+
+        { $unwind: "$Address" },
 
         {
           $project: {
-            item: '$Address'
-
-          }
-        },
-
-        {
-          $project: {
-            item: 1,
-            }
+            item: "$Address",
           },
-         
+        },
+      ]);
+      const items = Address.map((obj) => obj.item);
 
-      ])
-      
-      orderaddress=address[0].item;
-    
+      let orderaddress = items;
+      console.log(orderaddress, '----------------------------');
+
       let status = orderData['payment-method'] === 'COD' ? 'paid' : 'pending'
-    
+
       let orderdata = {
 
-        name:orderaddress.fname,
+        name: orderaddress.fname,
         paymentStatus: status,
-        paymentmode:orderData['payment-method'],
+        paymentmode: orderData['payment-method'],
         paymenmethod: orderData['payment-method'],
         productDetails: productdetails,
         shippingAddress: orderaddress,
@@ -656,21 +697,51 @@ module.exports = {
           resolve(orders)
         })
       }
-         await  user.cart.deleteMany({ user: orderData.user }).then(()=>{
-          resolve()
-         })
-    
+      await user.cart.deleteMany({ user: orderData.user }).then(() => {
+        resolve()
+      })
+
     })
   },
 
-  createData:(details,dates)=>
-  {
+  getAddress: (userId) => {
+    return new Promise(async (resolve, reject) => {
+      await user.address
+        .aggregate([
+          {
+            $match: {
+              userid: ObjectId(userId),
+            },
+          },
+          {
+            $unwind: "$Address",
+          },
+
+          {
+            $project: {
+              item: "$Address",
+            },
+          },
+
+          {
+            $project: {
+              item: 1,
+            },
+          },
+        ])
+        .then((address) => {
+          resolve(address);
+        });
+    });
+  },
+
+  createData: (details, dates) => {
     let address = details.address[0]
     let product = details.products[0][0]
     let orderDetails = details.details.createdAt
-  
-    console.log('orderdetails',orderDetails);
-    let myDate=dates(orderDetails);
+
+    console.log('orderdetails', orderDetails);
+    let myDate = dates(orderDetails);
 
     let data = {
       // Customize enables you to provide your own templates
@@ -682,7 +753,7 @@ module.exports = {
         // The logo on top of your invoice
         logo: "https://cdn.freelogodesign.org/files/ff0105e7b374444a99ea2be533fd7d6d/thumb/logo_200x200.png?v=0",
         // The invoice background
- 
+
       },
       // Your own data
       sender: {
@@ -691,11 +762,11 @@ module.exports = {
         zip: "4567 CD",
         city: "Los santos",
         country: "America",
-       
+
       },
       // Your recipient
       client: {
-    
+
         company: address.fname,
         address: address.street,
         zip: address.pincode,
@@ -705,9 +776,9 @@ module.exports = {
 
       information: {
         number: address.mobile,
-        date:myDate,
-        "due-date":myDate
-        
+        date: myDate,
+        "due-date": myDate
+
       },
 
       products: [
@@ -763,7 +834,7 @@ module.exports = {
         amount: parseInt(total),
         currency: "INR",
         receipt: "" + orderId,
-      }  
+      }
       instance.orders.create(options, function (err, order) {
         if (err) {
         } else {
@@ -773,7 +844,7 @@ module.exports = {
 
     })
   },
-  
+
   verifyPayment: (details) => {
     return new Promise((resolve, reject) => {
       try {
@@ -820,8 +891,24 @@ module.exports = {
 
     })
   },
+
+  deleteAddress: (Id) => {
+    console.log(Id);
+    return new Promise((resolve, reject) => {
+      user.address
+        .updateOne(
+          { _id: Id.deleteId },
+          {
+            $pull: { Address: { _id: Id.addressId } },
+          }
+        )
+        .then((response) => {
+          resolve({ deleteAddress: true });
+        });
+    });
+  },
   postAddress: (userId, data) => {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
 
       let addressInfo = {
         fname: data.fname,
@@ -835,42 +922,42 @@ module.exports = {
         email: data.email,
 
       }
-   
 
 
-        let AddressInfo = await user.address.findOne({ userid: userId })
-        if (AddressInfo) {
+
+      let AddressInfo = await user.address.findOne({ userid: userId })
+      if (AddressInfo) {
 
 
-          await user.address.updateOne({ userid: userId },
+        await user.address.updateOne({ userid: userId },
+          {
+            "$push":
             {
-              "$push":
-              {
-                "Address": addressInfo
+              "Address": addressInfo
 
-              }
-            }).then((response) => {
-              resolve(response)
-            })
-
-
-
-        } else {
-
-
-          let addressData = new user.address({
-            userid: userId,
-
-            Address: addressInfo
-
+            }
+          }).then((response) => {
+            resolve(response)
           })
 
-          await addressData.save().then((response) => {
-            resolve(response)
-          });
-        }
-      })
-   
+
+
+      } else {
+
+
+        let addressData = new user.address({
+          userid: userId,
+
+          Address: addressInfo
+
+        })
+
+        await addressData.save().then((response) => {
+          resolve(response)
+        });
+      }
+    })
+
   },
   orderPage: (userId) => {
     return new Promise(async (resolve, reject) => {
@@ -890,24 +977,24 @@ module.exports = {
       })
     })
 
-  },  
+  },
   viewOrderDetails: (orderId) => {
     return new Promise(async (resolve, reject) => {
 
-  let productid = await user.order.findOne({ "orders._id": orderId },{'orders.$':1});
+      let productid = await user.order.findOne({ "orders._id": orderId }, { 'orders.$': 1 });
 
-   
-   let details=productid.orders[0]
-   let order=productid.orders[0].productDetails
- 
-   const productDetails = productid.orders.map(object => object.productDetails);
-   const address= productid.orders.map(object => object.shippingAddress);
-   const products = productDetails.map(object => object)
-     
-        resolve({products,address, details,})
-      
-    
-           
+
+      let details = productid.orders[0]
+      let order = productid.orders[0].productDetails
+
+      const productDetails = productid.orders.map(object => object.productDetails);
+      const address = productid.orders.map(object => object.shippingAddress);
+      const products = productDetails.map(object => object)
+
+      resolve({ products, address, details, })
+
+
+
     })
 
 
@@ -920,7 +1007,7 @@ module.exports = {
 
       let orders = await user.order.find({ 'orders._id': orderId })
 
-    
+
 
       let orderIndex = orders[0].orders.findIndex(orders => orders._id == orderId);
       console.log(orderIndex + "order..................");
@@ -948,7 +1035,7 @@ module.exports = {
 
       let orders = await user.order.find({ 'orders._id': orderId })
 
-    
+
 
       let orderIndex = orders[0].orders.findIndex(orders => orders._id == orderId)
 
@@ -971,14 +1058,51 @@ module.exports = {
   },
 
 
-  searchProduct:(product)=>{
-    return new Promise(async(resolve, reject) => {
-    
-  
+  searchProduct: (product) => {
+    return new Promise(async (resolve, reject) => {
 
-    resolve(search)
-      
+
+
+      resolve(search)
+
     })
-  }
+  },
+
+  productSearch: (searchData) => {
+    let keyword = searchData.search
+    console.log(keyword);
+    return new Promise(async (resolve, reject) => {
+      try {
+        const products = await user.product.find({ Productname: { $regex: new RegExp(keyword, 'i') } });
+
+        if (products.length > 0) {
+          console.log(products);
+          resolve(products);
+        } else {
+          reject('No products found.');
+        }
+      } catch (err) {
+        console.log(err);
+        reject(err);
+      }
+    });
+  },
+
+  postSort: (sortOption) => {
+    return new Promise(async (resolve, reject) => {
+      let products;
+      if (sortOption === 'price-low-to-high') {
+
+        products = await user.product.find().sort({ Price: 1 }).exec();
+      } else if (sortOption === 'price-high-to-low') {
+
+        products = await user.product.find().sort({ Price: -1 }).exec();
+      } else {
+        products = await user.product.find().exec();
+      }
+      resolve(products)
+    })
+
+  },
 
 };
