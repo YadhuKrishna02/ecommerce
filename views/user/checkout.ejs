@@ -210,7 +210,7 @@
         //   alert(response.razorpay_payment_id);
         //   alert(response.razorpay_order_id);
         //   alert(response.razorpay_signature)
-        verifypayment(response, order);
+        verifyPayment(response, order);
       },
       prefill: {
         name: 'Gaurav Kumar',
@@ -266,7 +266,7 @@
               method: 'get',
               success: (response) => {
                 if (response.status) {
-                  location.replace('/success');
+                  location.replace('/order_success');
                 } else {
                   Swal.fire({
                     icon: 'error',
@@ -285,7 +285,7 @@
 
   function verifyPayment(payment, order) {
     $.ajax({
-      url: '/verify-payment',
+      url: '/verify_payment',
       data: {
         payment,
         order,

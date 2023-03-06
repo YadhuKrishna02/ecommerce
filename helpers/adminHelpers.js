@@ -248,15 +248,17 @@ module.exports = {
     })
   },
 
-  getOrderByDate: () => {
-    return new Promise(async (resolve, reject) => {
-      const startDate = new Date('2022-01-01');
-      await user.order.find({ createdAt: { $gte: startDate } }).then((response) => {
-        console.log(response);
-        resolve(response)
+  getOrderByDate: async () => {
 
-      })
-    });
+    try {
+      const startDate = new Date('2022-01-01');
+      let orderDate = await user.order.find({ createdAt: { $gte: startDate } });
+      console.log(orderDate);
+      return orderDate
+    }
+    catch (err) {
+      console.log(err);
+    }
   },
 
 
@@ -376,6 +378,21 @@ module.exports = {
         {
           $match: {
             "orders.paymentmode": "online"
+          }
+        },
+      ])
+      resolve(response)
+    })
+  },
+  getPaypalCount: () => {
+    return new Promise(async (resolve, reject) => {
+      let response = await user.order.aggregate([
+        {
+          $unwind: "$orders"
+        },
+        {
+          $match: {
+            "orders.paymentmode": "paypal"
           }
         },
       ])

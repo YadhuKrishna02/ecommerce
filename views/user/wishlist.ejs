@@ -24,7 +24,7 @@
                 <tr>
                   <td class="image product-thumbnail">
                     <img
-                      src="/uploads/<%=wishlistItems.wishlistItems.Image %>"
+                      src="/uploads/<%=wishlistItems.wishlistItems.Image[0] %>"
                       alt="#"
                     />
                   </td>
@@ -44,7 +44,7 @@
                       type="button"
                       aria-label="Add To Cart"
                       class="action-btn hover-up"
-                      onclick="addtocart('<%-wishlistItems._id%>')
+                      onclick="addtocart('<%-wishlistItems.item%>')
                       Swal.fire({
                         position: 'center',
                         icon: 'success',

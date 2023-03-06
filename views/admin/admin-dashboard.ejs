@@ -145,13 +145,14 @@
     },
   });
 
-  var xValue = ['Online', 'COD'];
+  var xValue = ['Razorpay', 'COD', 'Paypal'];
   var yValue = [];
   let paymentData = JSON.parse(document.getElementById('payment').innerHTML);
   yValue.push(paymentData[0]);
   yValue.push(paymentData[1]);
+  yValue.push(paymentData[2]);
 
-  var barColors = ['yellow', '#seablue', '#purple', '#grey', '#red'];
+  var barColors = ['#27968B', 'grey', 'orange'];
 
   new Chart('myChart2', {
     type: 'pie',

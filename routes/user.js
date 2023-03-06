@@ -4,8 +4,12 @@ const router = express.Router();
 const controllers = require("../controllers/usercontroller");
 const middleware = require("../middlewares/middleware");
 const { route } = require("./admin");
+
+const asyncHandler = fn => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next)
+}
 /* GET home page. */
-router.get("/", controllers.getHome);
+router.get("/", asyncHandler(controllers.getHome));
 
 router.get("/login", middleware.userSession, controllers.getUserLogin);
 
@@ -23,7 +27,7 @@ router.get("/enter_new_pwd", middleware.userSession, controllers.getEnterNewPwd)
 
 router.post("/enter_new_pwd/:id", middleware.userSession, controllers.updatePassword)
 
-router.get("/profile/:id", middleware.userSession, controllers.getProfilePage);
+router.get("/profile/:id", middleware.userSession, controllers.getProfile);
 
 router.put("/profile/:id", controllers.changeProfile);
 
@@ -53,34 +57,15 @@ router.get('/view_wishlist', middleware.userSession, controllers.viewWishlist);
 
 router.delete('/delete_wishlist', middleware.userSession, controllers.deleteWishList)
 
+router.get('/product_details/:id', middleware.userSession, controllers.getProductDetails)
 
-
-router.get(
-  "/product_details/:id",
-  middleware.userSession,
-  controllers.getProductDetails
-);
-
-router.get(
-  "/add_to_cart/:id",
-  middleware.userSession,
-  controllers.getAddToCart
-);
+router.get('/add_to_cart/:id', middleware.userSession, controllers.getAddToCart)
 
 router.get("/view_cart", middleware.userSession, controllers.getViewCart);
 
-router.put(
-  "/change_product_quantity",
-  middleware.userSession,
-  controllers.postchangeProductQuantity
-);
+router.put("/change_product_quantity", middleware.userSession, controllers.postchangeProductQuantity);
 
-router.delete(
-  "/delete_cart_item",
-  middleware.userSession,
-  controllers.getDeleteCart
-);
-
+router.delete("/delete_cart_item", middleware.userSession, controllers.getDeleteCart);
 
 router.get("/check_out", middleware.userSession, controllers.checkOutPage);
 
@@ -100,11 +85,15 @@ router.put('/return_order', middleware.userSession, controllers.getReturnOrder)
 
 router.get('/order_details', middleware.userSession, controllers.orderDetails)
 
+router.get("/new_address", middleware.userSession, controllers.getAddresspage)
+
+router.post("/new_address", middleware.userSession, controllers.postNewAddresspage)
+
 router.get("/add_address", middleware.userSession, controllers.getAddresspage)
 
 router.post('/add_address', middleware.userSession, controllers.postAddresspage)
 
-router.get('/view_address', controllers.getViewAddress)
+router.get('/view_address', middleware.userSession, controllers.getViewAddress)
 
 router.delete('/delete_address', controllers.deleteAddress)
 
@@ -116,11 +105,7 @@ router.get('/order_success', middleware.userSession, controllers.getSuccessPage)
 
 router.post("/apply_coupon", middleware.userSession, controllers.applyCoupon);
 
-router.get(
-  "/coupon_validator",
-  middleware.userSession,
-  controllers.couponValidator
-);
+router.get('/coupon_validator', middleware.userSession, controllers.couponValidator)
 
 router.get("/coupon_verify", middleware.userSession, controllers.couponVerify);
 

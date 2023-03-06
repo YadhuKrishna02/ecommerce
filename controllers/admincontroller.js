@@ -12,13 +12,10 @@ let adminStatus, getDate;
 let viewCategory;
 module.exports = {
   getAdminLogin: (req, res) => {
-    console.log(adminloginErr);
-    // res.render("admin/admin-dashboard", { layout: "adminLayout", adminStatus,adminloginErr})
     res.redirect("/admin");
   },
 
   postAdminLogin: (req, res) => {
-    // console.log(req.body);
     if (
       req.body.email == adminCredential.email &&
       req.body.password == adminCredential.password
@@ -59,25 +56,30 @@ module.exports = {
     let codCount = orderByCod.length
 
     let orderByOnline = await adminHelper.getOnlineCount()
+    let orderByPaypal = await adminHelper.getPaypalCount()
     let totalUser = await adminHelper.totalUserCount()
 
     let totalUserCount = totalUser.length
-
+    let paypalCount = orderByPaypal.length
     let onlineCount = orderByOnline.length;
 
 
     paymentCount.push(onlineCount)
     paymentCount.push(codCount)
-    await adminHelper.getOrderByDate().then((response) => {
-      let result = response[0].orders
-      for (let i = 0; i < result.length; i++) {
-        let ans = {}
-        ans['createdAt'] = result[i].createdAt
-        days.push(ans)
-        ans = {}
+    paymentCount.push(paypalCount)
 
+    await adminHelper.getOrderByDate().then((response) => {
+      if (response.length > 0) {
+        let result = response[0]?.orders
+        for (let i = 0; i < result.length; i++) {
+          let ans = {}
+          ans['createdAt'] = result[i].createdAt
+          days.push(ans)
+          ans = {}
+
+        }
       }
-      console.log(days);
+
 
 
       days.forEach((order) => {
@@ -85,7 +87,6 @@ module.exports = {
         ordersPerDay[day] = (ordersPerDay[day] || 0) + 1;
 
       });
-      console.log(ordersPerDay);
 
     })
 
@@ -99,8 +100,7 @@ module.exports = {
       for (let i = 0; i < length; i++) {
         total += response[i].orders.totalPrice;
       }
-      console.log(total);
-      res.render("admin/admin-dashboard", { layout: "adminLayout", letiable, adminStatus, length, total, totalProducts, ordersPerDay, paymentCount, totalUserCount });
+      res.render("admin/admin-dashboard", { layout: "adminLayout", letiable, adminStatus, length, total, totalProducts, ordersPerDay, paymentCount, paypalCount, totalUserCount });
 
     })
   },
@@ -141,7 +141,6 @@ module.exports = {
     });
   },
   postCategory: (req, res) => {
-    console.log(req.body.categoryname);
     adminHelper.addCategory(req.body).then((data) => {
       let categoryStatus = data.categoryStatus;
       if (categoryStatus == false) {
@@ -166,7 +165,6 @@ module.exports = {
   },
   getEditCategory: (req, res) => {
     adminHelper.findCategory(req.params.id).then((response) => {
-      console.log(response);
       res.render("admin/edit-category", {
         layout: "adminLayout",
         adminStatus,
@@ -183,7 +181,6 @@ module.exports = {
   },
   getAddProduct: (req, res) => {
     adminHelper.findAllCategory().then((response) => {
-      console.log(response);
       res.render("admin/add-product", {
         layout: "adminLayout",
         adminStatus,
@@ -192,8 +189,10 @@ module.exports = {
     });
   },
   postAddProduct: (req, res) => {
+    console.log(req.files);
+    console.log(req.file);
+    console.log('55555555555555555');
     const image = req.files.map(files => (files.filename))
-    console.log(image);
     adminHelper.AddProduct(req.body, image).then((response) => {
       res.redirect("/admin/view_product");
     });
@@ -235,24 +234,12 @@ module.exports = {
       });
   },
 
-  //delete view product
-
-  // deleteViewProduct: (req, res) => {
-  //   adminHelper.deleteViewProduct(req.params.id).then((response) => {
-  //     res.redirect("/admin/view_product");
-  //   });
-  // },
-
-  // List Product
-
   listProduct: (req, res) => {
-    // console.log(req.params.id + "in list");
     adminHelper.listProduct(req.params.id).then(() => {
       res.json({ status: true });
     });
   },
   unlistProduct: (req, res) => {
-    // console.log(req.params.id + "in unlist");
     adminHelper.unlistProduct(req.params.id).then(() => {
       res.json({ status: false });
     });
@@ -279,7 +266,6 @@ module.exports = {
       discountPercentage: req.body.discountPercentage,
       maxDiscountValue: req.body.maxDiscountValue,
     };
-    console.log(data);
     couponHelpers.addNewCoupon(data).then((response) => {
       res.json(response);
     });
@@ -294,7 +280,6 @@ module.exports = {
       return `${isNaN(day) ? "00" : day}-${isNaN(month) ? "00" : month}-${isNaN(year) ? "0000" : year
         }`;
     };
-    console.log(coupon);
     res.render("admin/coupon", {
       layout: "adminLayout",
       coupon,
@@ -303,7 +288,6 @@ module.exports = {
     });
   },
   deleteCoupon: (req, res) => {
-    console.log(req.params.id);
     couponHelpers.deleteCoupon(req.params.id).then((response) => {
       res.json(response);
     });
@@ -323,11 +307,11 @@ module.exports = {
         return `${isNaN(day) ? "00" : day}-${isNaN(month) ? "00" : month}-${isNaN(year) ? "0000" : year
           } ${date.getHours(hours)}:${date.getMinutes(minutes)}:${date.getSeconds(seconds)}`;
       };
+
       res.render('admin/order-list', { layout: 'adminLayout', adminStatus, response, getDate })
     })
   },
   getOrderDetails: (req, res) => {
-    console.log(req.query.orderid);
     adminHelper.orderDetails(req.query.orderid).then((order) => {
       const getDate = (date) => {
         let orderDate = new Date(date);
@@ -348,9 +332,6 @@ module.exports = {
 
   },
   postOrderDetails: (req, res) => {
-    console.log(typeof req.query.orderId);
-    console.log(req.body);
-    console.log(req.body);
     adminHelper.changeOrderStatus(req.query.orderId, req.body).then((response) => {
       res.redirect('/admin/orders_list')
     })

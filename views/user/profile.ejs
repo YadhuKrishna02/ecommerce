@@ -21,40 +21,37 @@
                 >Address</a
               >
             </nav>
+            <nav class="nav bg-light text-light flex-lg-column mb-4">
+              <a class="nav-link active" aria-current="page" href="/new_address"
+                >Add Address</a
+              >
+            </nav>
           </aside>
           <div class="col-lg-9">
+            <!-- content-body .// -->
             <section class="content-body p-xl-4">
               <form id="profile">
                 <div class="row">
                   <div class="col-lg-8">
                     <div class="row gx-3">
-                      <div class="col-6 mb-3">
-                        <label class="form-label">First Name</label>
+                      <div class="col-12 mb-3">
+                        <label class="form-label">User Name</label>
                         <input
                           class="form-control"
                           name="fname"
                           type="text"
-                          value="<%=userAddDetails[0].fname%>"
+                          value="<%=data.username%>"
                         />
                       </div>
                       <!-- col .// -->
-                      <div class="col-6 mb-3">
-                        <label class="form-label">Last Name</label>
 
-                        <input
-                          class="form-control"
-                          name="lname"
-                          type="text"
-                          value="<%=userAddDetails[0].lname%>"
-                        />
-                      </div>
                       <div class="col-lg-6 mb-3">
                         <label class="form-label">Email</label>
                         <input
                           class="form-control"
                           name="email"
                           type="email"
-                          value="<%=userAddDetails[0].email%>"
+                          value="<%=data.email%>"
                         />
                       </div>
                       <!-- col .// -->
@@ -64,17 +61,7 @@
                           class="form-control"
                           name="phone"
                           type="number"
-                          value="<%=userAddDetails[0].mobile%>"
-                        />
-                      </div>
-                      <!-- col .// -->
-                      <div class="col-lg-6 mb-3">
-                        <label class="form-label">Address</label>
-                        <input
-                          class="form-control"
-                          name="address"
-                          type="text"
-                          value="<%=userAddDetails[0].street%>"
+                          value="<%=data.phonenumber%>"
                         />
                       </div>
                       <!-- col .// -->
@@ -87,45 +74,11 @@
                 <br />
                 <button
                   class="btn btn-primary"
-                  onclick="changeProfile('<%=locals.profileId%>', '<%=userAddDetails[0].fname%>', '<%=userAddDetails[0].lname%>', '<%=userAddDetails[0].email%>', '<%=userAddDetails[0].mobile%>', '<%=userAddDetails[0].street%>')"
+                  onclick="changeProfile('<%=data._id%>')"
                 >
                   Save changes
                 </button>
               </form>
-              <hr class="my-5" />
-              <div class="row" style="max-width: 920px">
-                <div class="col-md">
-                  <article class="box mb-3 bg-light">
-                    <a
-                      class="btn float-end btn-light btn-sm rounded font-md"
-                      href="/reset_password"
-                      >Change</a
-                    >
-                    <h6>Password</h6>
-                    <small class="text-muted d-block" style="width: 70%"
-                      >You can reset or change your password by clicking
-                      here</small
-                    >
-                  </article>
-                </div>
-                <!-- col.// -->
-                <div class="col-md">
-                  <article class="box mb-3 bg-light">
-                    <a
-                      class="btn float-end btn-light rounded btn-sm font-md"
-                      href="#"
-                      >Deactivate</a
-                    >
-                    <h6>Remove account</h6>
-                    <small class="text-muted d-block" style="width: 70%"
-                      >Once you delete your account, there is no going
-                      back.</small
-                    >
-                  </article>
-                </div>
-                <!-- col.// -->
-              </div>
-              <!-- row.// -->
             </section>
             <!-- content-body .// -->
           </div>

@@ -129,16 +129,4 @@ function validatePassword(){
         }
     }
 
-    function validateForm() {
-  if (
-    !validatePassword
-  ) {
-    submitError.style.display = "block";
-    submitError.innerHTML = "Please fix all errors to submit.";
-    setTimeout(function () {
-      submitError.style.display = "none";
-    }, 3000);
-    return false;
-  }
-}
 </script>

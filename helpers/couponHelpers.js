@@ -37,7 +37,7 @@ module.exports = {
         db.coupon.find({}).then((data) => {
           resolve(data);
         });
-      } catch (error) {}
+      } catch (error) { }
     });
   },
   applyCoupon: (code, total) => {
@@ -55,11 +55,11 @@ module.exports = {
               if (discountAmount > coupon.maxDiscountValue) {
                 console.log("amal");
                 discountAmount = coupon.maxDiscountValue;
-                total=total-discountAmount
-                resolve({ status: true, discountAmount: discountAmount,total: total });
+                total = total - discountAmount
+                resolve({ status: true, discountAmount: discountAmount, total: total });
               } else {
-                total=total-discountAmount
-                resolve({ status: true, discountAmount: discountAmount,total: total });
+                total = total - discountAmount
+                resolve({ status: true, discountAmount: discountAmount, total: total });
               }
             } else {
               console.log("ded1");

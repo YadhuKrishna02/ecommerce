@@ -69,8 +69,21 @@
                                     <div class="product-action-1">
                                         <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal">
                                             <i class="fi-rs-search"></i></a>
-                                        <a aria-label="Add To Wishlist" class="action-btn hover-up"onclick="addtowishlist('<%-response._id%>')" ><i class="fi-rs-heart"></i></a>
-                                        <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
+                                            <button
+                                                type="button"
+                                                aria-label="Add To Wishlist"
+                                                class="action-btn hover-up"
+                                                onclick="addToWishlist('<%-response._id%>')
+                                                Swal.fire({
+                                                position: 'center',
+                                                icon: 'success',
+                                                title: 'Product is successfully added to wishlist',
+                                                showConfirmButton: false,
+                                                timer: 1500
+                                                })"
+                                                >
+                                                <i class="fi-rs-heart"></i>
+                                             </button>
                                     </div>
                                     <div class="product-badges product-badges-position product-badges-mrg">
                                         
@@ -95,7 +108,21 @@
                                     
                                     <div class="product-action-1 show">
                                   
-                                    <button type="button" aria-label="Add To Cart" class="action-btn hover-up"  >  <i class="fi-rs-shopping-bag-add" ></i>  </button>  
+                                    <button
+                                        type="button"
+                                        aria-label="Add To Cart"
+                                        class="action-btn hover-up"
+                                        onclick="addtocart('<%-response._id%>');
+                                        Swal.fire({
+                                                position: 'center',
+                                                icon: 'success',
+                                                title: 'Product is successfully added to cart',
+                                                showConfirmButton: false,
+                                                timer: 1500
+                                            })"
+                                        >
+                                        <i class="fi-rs-shopping-bag-add"></i>
+                                        </button>
                                     </a>    
                                       
                                     </a>       
@@ -113,7 +140,7 @@
                     <div class="widget-category mb-30">
                         <h5 class="section-title style-1 mb-30 wow fadeIn animated">Category</h5>
                         <ul class="categories">
-                            <% viewCategory.forEach(function(response,index) { %>
+                            <% category.forEach(function(response,index) { %>
                             <li><a href="/category?cname=<%= response.categoryName%>"><%= response.categoryName%></a></li>
                          <% }) %>
                             

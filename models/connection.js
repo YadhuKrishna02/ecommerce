@@ -1,11 +1,5 @@
 const mongoose = require("mongoose");
-const db = mongoose
-  .connect("mongodb://0.0.0.0:27017/ecommerce", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("Database connected!"))
-  .catch((err) => console.log(err));
+
 
 const userschema = new mongoose.Schema({
   username: {
@@ -45,7 +39,7 @@ const otpSchema = new mongoose.Schema({
   otp: { type: String, required: true },
   phoneNumber: { type: String, required: true },
   createdAt: { type: Date, default: Date.now }
-}); 
+});
 
 const categorySchema = new mongoose.Schema({
   categoryName: {
@@ -65,7 +59,7 @@ const productSchema = new mongoose.Schema({
     type: Number,
   },
   Image: {
-    type: String,
+    type: Array,
   },
   Price: {
     type: Number,
@@ -93,7 +87,7 @@ const cartSchema = new mongoose.Schema({
   ],
 });
 
-const wishlistSchema= new mongoose.Schema({
+const wishlistSchema = new mongoose.Schema({
 
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -104,35 +98,35 @@ const wishlistSchema= new mongoose.Schema({
   wishlistItems: [
     {
       productId: { type: mongoose.Schema.Types.ObjectId, ref: "product" },
-      
+
     },
   ],
   createdAt: {
     type: Date,
     default: new Date(),
   },
-  
+
 })
 
 
-const addressSchema=new  mongoose.Schema({
+const addressSchema = new mongoose.Schema({
 
-    
-  userid:{
-    type:mongoose.Schema.Types.ObjectId,
+
+  userid: {
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'user'
   },
-  Address:[
+  Address: [
     {
-      fname:{type:String},
-      lname:{type:String},
-      street:{type:String},
-      apartment:{type:String},
-      city:{type:String},
-      state:{type:String},
-      pincode:{type:Number},
-      mobile:{type:Number},
-      email:{type:String}
+      fname: { type: String },
+      lname: { type: String },
+      street: { type: String },
+      apartment: { type: String },
+      city: { type: String },
+      state: { type: String },
+      pincode: { type: Number },
+      mobile: { type: Number },
+      email: { type: String }
     }
   ]
 
@@ -140,33 +134,33 @@ const addressSchema=new  mongoose.Schema({
 })
 const orderSchema = new mongoose.Schema({
 
-  userid:{
-    type:mongoose.Schema.Types.ObjectId,
+  userid: {
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'user'
   },
   orders: [{
-  
-      
-          name:String,
-          productDetails:Array,
-          paymentMethod: String,
-          paymentStatus: String,
-          totalPrice: Number,
-          totalQuantity: Number,
-          shippingAddress: Object,
-          paymentmode:String,
-          status: {
-              type: Boolean,
-              default: true
-          },
-          createdAt: {
-              type: Date,
-              default: new Date()
-          },
-          orderStatus:{
-            type:String,default:"success"
-        },
-      }
+
+
+    name: String,
+    productDetails: Array,
+    paymentMethod: String,
+    paymentStatus: String,
+    totalPrice: Number,
+    totalQuantity: Number,
+    shippingAddress: Object,
+    paymentmode: String,
+    status: {
+      type: Boolean,
+      default: true
+    },
+    createdAt: {
+      type: Date,
+      default: new Date()
+    },
+    orderStatus: {
+      type: String, default: "success"
+    },
+  }
   ]
 })
 
@@ -180,6 +174,10 @@ const couponSchema = new mongoose.Schema({
   minPurchase: Number,
   discountPercentage: Number,
   maxDiscountValue: Number,
+  active: {
+    type: Boolean,
+    default: false
+  },
   description: String,
   createdAt: {
     type: Date,
@@ -221,11 +219,11 @@ module.exports = {
   categories: mongoose.model("categories", categorySchema),
   product: mongoose.model("product", productSchema),
   cart: mongoose.model("cart", cartSchema),
-  order:mongoose.model('order',orderSchema),
-  address:mongoose.model('address',addressSchema),
+  order: mongoose.model('order', orderSchema),
+  address: mongoose.model('address', addressSchema),
   coupon: mongoose.model("coupon", couponSchema),
-  otp:mongoose.model("otp",otpSchema),
-  wishlist:mongoose.model("wishlist",wishlistSchema),
-  banner :mongoose.model('Banner', bannerSchema),
+  otp: mongoose.model("otp", otpSchema),
+  wishlist: mongoose.model("wishlist", wishlistSchema),
+  banner: mongoose.model('Banner', bannerSchema),
 
 };

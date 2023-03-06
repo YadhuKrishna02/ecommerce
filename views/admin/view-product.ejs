@@ -43,7 +43,7 @@
 
                 <td>
                   <img
-                    src="/uploads/<%= response.Image %>"
+                    src="/uploads/<%= response.Image[0] %>"
                     alt=""
                     style="width: 50px; height: 50px"
                     ;
@@ -85,8 +85,8 @@
 <script>
   function listProduct(prodId) {
     $.ajax({
-      url: "/admin/list_product/" + prodId,
-      method: "PUT",
+      url: '/admin/list_product/' + prodId,
+      method: 'PUT',
       success: (response) => {
         // document.querySelector(".activeProduct").innerHTML = "Unlist";
         //   response.productActive;
@@ -96,8 +96,8 @@
   }
   function unlistProduct(prodId) {
     $.ajax({
-      url: "/admin/unlist_product/" + prodId,
-      method: "PUT",
+      url: '/admin/unlist_product/' + prodId,
+      method: 'PUT',
       success: (response) => {
         // document.querySelector(".activeProduct").innerHTML = "List";
         //   response.productActive;
