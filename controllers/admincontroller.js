@@ -41,7 +41,7 @@ module.exports = {
   getDashboard: async (req, res) => {
 
 
-    let letiable = req.session.admin;
+    let variable = req.session.admin;
 
     let totalProducts, days = []
     let ordersPerDay = {};
@@ -100,7 +100,7 @@ module.exports = {
       for (let i = 0; i < length; i++) {
         total += response[i].orders.totalPrice;
       }
-      res.render("admin/admin-dashboard", { layout: "adminLayout", letiable, adminStatus, length, total, totalProducts, ordersPerDay, paymentCount, paypalCount, totalUserCount });
+      res.render("admin/admin-dashboard", { layout: "adminLayout", variable, adminStatus, length, total, totalProducts, ordersPerDay, paymentCount, paypalCount, totalUserCount });
 
     })
   },

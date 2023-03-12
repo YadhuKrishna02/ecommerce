@@ -29,7 +29,7 @@ const paypalClient = new paypal.core.PayPalHttpClient(
 
 const client = require("twilio")(otp.accountId, otp.authToken);
 
-let userSession, number, loggedUser, profileId, userDetails, userAddDetails, getDate;
+let userSession, number, loggedUser, profileId, userDetails, userAddDetails, getDate, finalTotal;
 let count, wishcount,
   otpNumber, total
 couponPrice = 0;
@@ -324,10 +324,11 @@ module.exports = {
     try {
       let userId = req.session.user;
       total = await cartHelper.totalCheckOutAmount(req.session.user.id);
+
       let count = await cartHelper.getCartItemsCount(req.session.user.id);
 
       let cartItems = await cartHelper.viewCart(req.session.user.id);
-
+      console.log(cartItems);
 
       res.render("user/view-cart", {
         cartItems,
@@ -335,7 +336,7 @@ module.exports = {
         userSession,
         profileId,
         count, wishcount,
-        total,
+        total, finalTotal
       });
     } catch (error) {
       res.status(500)
@@ -378,8 +379,8 @@ module.exports = {
 
     try {
       let users = req.session.user.id
-      if (req.session.user.total) {
-        total = req.session.user.total
+      if (req.session.user.finalTotal) {
+        total = req.session.user.finalTotal
       }
       else {
 
@@ -403,14 +404,14 @@ module.exports = {
   postcheckOutPage: async (req, res) => {
 
     try {
-      if (req.session.user.total) {
-        total = req.session.user.total
+      if (req.session.user.finalTotal) {
+        total = req.session.user.finalTotal
       }
       else {
 
         total = await cartHelper.totalCheckOutAmount(req.session.user.id)
       }
-      req.session.user.total = null
+      req.session.user.finalTotal = null
 
       let order = await orderHelper.placeOrder(req.body, total).then(async (response) => {
 
@@ -567,7 +568,7 @@ module.exports = {
 
   getAddresspage: (req, res) => {
     try {
-      res.render('user/add-new-address', { userSession, profileId, wishcount, count })
+      res.render('user/add-address', { userSession, profileId, wishcount, count })
 
     } catch (error) {
       res.status(500)
@@ -646,11 +647,14 @@ module.exports = {
 
   category: async (req, res) => {
     try {
-      viewCategory = await adminHelper.viewAddCategory()
+      category = await adminHelper.viewAddCategory()
 
       await userhelpers.category(req.query.cname).then((response) => {
+        if (response) {
 
-        res.render('user/shop-new', { response, userSession, viewCategory, wishcount, count })
+          res.render('user/shop-new', { response, userSession, category, wishcount, count })
+        }
+
       })
     } catch (error) {
       res.status(500)
@@ -661,39 +665,33 @@ module.exports = {
   //**********COUPON STARTS HERE************** */
   //************************************************************ */
 
-  applyCoupon: async (req, res) => {
 
-    try {
-      let code = req.query.code;
-      total = await cartHelper.totalCheckOutAmount(req.session.user);
-      couponHelpers.applyCoupon(code, total).then((response) => {
-        req.session.user.total = response.total
-        couponPrice = response.discountAmount ? response.discountAmount : 0;
-        res.json(response);
-      });
-    } catch (error) {
-      res.status(500)
-    }
+  validateCoupon: async (req, res) => {
+
+    console.log(req.query.couponName);
+    let code = req.query.couponName;
+    let total = await cartHelper.totalCheckOutAmount(profileId)
+    couponHelpers.couponValidator(code, profileId, total).then((response) => {
+      res.json(response)
+    })
+
   },
-  couponValidator: async (req, res) => {
 
-    try {
-      let code = req.query.code;
-      couponHelpers
-        .couponValidator(code, req.session.user.id)
-        .then((response) => {
-          res.json(response);
-        });
-    } catch (error) {
-      res.status(500)
+  postCart: async (req, res) => {
+
+    let couponData = req.body
+    console.log(req.body);
+    couponName = req.body.couponName
+    couponTotal = req.body.total
+    discountAmount = req.body.discountAmount
+    if (couponData.couponName) {
+      await couponHelpers.addCouponIntUseroDb(couponData, req.session.user.id).then((response) => {
+        res.redirect("/check_out")
+      })
+    } else {
+      res.redirect('/check_out')
     }
-  },
-  couponVerify: async (req, res) => {
-    let code = req.query.code;
-    couponHelpers.couponVerify(code, req.session.user.id).then((response) => {
 
-      res.json(response);
-    });
   },
 
   //************************************************************ */
@@ -710,8 +708,11 @@ module.exports = {
 
 
     userhelpers.productSearch(req.body).then((response) => {
-      res.render('user/shop-new', { userSession, response, category, wishcount, count })
-      console.log(response);
+      if (response) {
+
+        res.render('user/shop-new', { userSession, response, category, wishcount, count })
+        console.log(response);
+      }
     }).catch((err) => {
       console.log(err);
       res.render('user/shop-new', { err, category, wishcount, count })
@@ -720,11 +721,13 @@ module.exports = {
   },
 
   postSort: async (req, res) => {
-    console.log(req.body);
     let sortOption = req.body['selectedValue'];
     let category = await adminHelper.viewAddCategory()
     userhelpers.postSort(sortOption).then((response) => {
-      res.render('user/shop-new', { response, category, count, wishcount })
+      if (response) {
+
+        res.render('user/shop-new', { response, category, count, wishcount })
+      }
     })
   },
 };

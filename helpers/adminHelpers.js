@@ -239,7 +239,9 @@ module.exports = {
   getAllOrders: () => {
     return new Promise(async (resolve, reject) => {
       let order = await user.order.aggregate([
+
         { $unwind: '$orders' },
+        { $match: { "orders.orderStatus": "Success" } }
 
       ]).then((response) => {
         resolve(response)
@@ -410,7 +412,7 @@ module.exports = {
     })
   },
 
-  getSalesReport: async () => {
+  getSalesReport: () => {
     return new Promise(async (resolve, reject) => {
       let response = await user.order.aggregate([
         {
@@ -482,8 +484,7 @@ module.exports = {
       ]).then((total) => {
 
 
-        resolve(total[0].total)
-        console.log(total[0].total, '------------------------------');
+        resolve(total[0]?.total)
 
 
       })
@@ -553,7 +554,7 @@ module.exports = {
       ]).then((total) => {
 
 
-        resolve(total[0].total)
+        resolve(total[0]?.total)
         // console.log(total[0].total[0], '------------------------------');
 
 

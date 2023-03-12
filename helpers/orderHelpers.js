@@ -48,6 +48,23 @@ module.exports = {
                 }
             ])
 
+            //inventory management
+
+            for (let i = 0; i < productdetails.length; i++) {
+                let response = await db.product.updateOne(
+                    {
+                        _id: productdetails[i]._id
+                    },
+                    {
+                        $inc: {
+                            Quantity: -productdetails[i].quantity
+                        }
+                    }
+                )
+                console.log(response);
+
+            }
+
             let Address = await db.address.aggregate([
                 { $match: { userid: ObjectId(orderData.user) } },
 
@@ -68,15 +85,16 @@ module.exports = {
             let orderaddress = items;
             console.log(orderaddress, '----------------------------');
 
-            let status = orderData['payment-method'] === 'COD' ? 'paid' : 'pending'
+            let status = orderData['payment-method'] === 'COD' ? 'Paid' : 'Pending';
+            let orderStatus = orderData['payment-method'] === 'COD' ? 'Success' : 'Pending'
 
             let orderdata = {
 
                 name: orderaddress.fname,
                 paymentStatus: status,
                 paymentmode: orderData['payment-method'],
-                paymenmethod: orderData['payment-method'],
                 productDetails: productdetails,
+                orderStatus: orderStatus,
                 shippingAddress: orderaddress,
                 totalPrice: total
             }
@@ -123,7 +141,7 @@ module.exports = {
                 $unwind: '$orders'
             },
             {
-                $sort: { 'orders:createdAt': -1 }
+                $sort: { 'orders.createdAt': -1 }
             }
             ]).then((response) => {
                 resolve(response)
@@ -132,33 +150,62 @@ module.exports = {
 
     },
 
+
     cancelOrder: (orderId, userId) => {
 
         return new Promise(async (resolve, reject) => {
 
             let orders = await db.order.find({ 'orders._id': orderId })
-
-
-
-            let orderIndex = orders[0].orders.findIndex(orders => orders._id == orderId);
-            console.log(orderIndex + "order..................");
-
+            let orderIndex = orders[0].orders.findIndex(orders => orders._id == orderId)
             await db.order.updateOne({ 'orders._id': orderId },
                 {
                     $set:
                     {
-                        ['orders.' + orderIndex + '.orderStatus']: 'cancelled'
+                        ['orders.' + orderIndex + '.OrderStatus']: 'Cancelled'
 
                     }
 
 
-                }).then((orders) => {
+                }).then(async (orders) => {
+
                     resolve(orders)
+                    let cancelledItems = await db.order.aggregate([
+                        {
+                            $unwind: "$orders"
+                        },
+                        {
+                            $match: {
+                                "orders.OrderStatus": "Cancelled"
+                            }
+                        },
+                        {
+                            $unwind: "$orders.productDetails"
+                        },
+                        {
+                            $project: {
+                                _id: 0,
+                                productDetails: "$orders.productDetails"
+                            }
+                        }
+                    ]);
+                    // after cancellation incermenting product quantity 
+
+                    for (let i = 0; i < cancelledItems.length; i++) {
+                        if (cancelledItems[i].productDetails.quantity !== 0) { // Check if quantity is defined
+                            let response = await user.product.updateOne(
+                                {
+                                    _id: cancelledItems[i].productDetails._id
+                                },
+                                {
+                                    $inc: {
+                                        Quantity: cancelledItems[i].productDetails.quantity
+                                    }
+                                }
+                            );
+                        }
+                    }
                 })
-
         })
-
-
     },
 
     returnOrder: (orderId, userId) => {
@@ -180,8 +227,31 @@ module.exports = {
                     }
 
 
-                }).then((orders) => {
+                }).then(async (orders) => {
+
                     resolve(orders)
+                    let returnedItems = await db.order.aggregate([
+                        {
+                            $unwind: "$orders"
+                        },
+                        {
+                            $match: {
+                                "orders.OrderStatus": "returned"
+                            }
+                        },
+                        {
+                            $unwind: "$orders.productDetails"
+                        },
+                        {
+                            $project: {
+                                _id: 0,
+                                productDetails: "$orders.productDetails"
+                            }
+                        }
+                    ]);
+                    // after cancellation incermenting product quantity 
+
+
                 })
 
         })

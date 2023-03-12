@@ -104,6 +104,20 @@
                       <span>95%</span>
                     </span>
                   </div>
+                   <div >
+                    <span >
+                        <span> <% if(response.Quantity>0) {%>
+                          In stock:<span class="in-stock text-danger ml-5,badge rounded-pill alert-warning"
+                              > <%=response.Quantity%></span>
+                        </span>    <%} else { %>
+                              Availability:<span class="in-stock text-danger ml-5,badge rounded-pill alert-warning"
+                              > OUT OF STOCK</span>
+                              <%} %></span>
+                        
+                    </span>
+                                                        
+                    </div>
+                 
                   <div class="product-price">
                     <span><%=response.Price%></span>
                   </div>

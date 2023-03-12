@@ -58,7 +58,7 @@
                                 <div class="product-img-action-wrap">
                                     <div class="product-img product-img-zoom">
                                         <a href="/product_details/<%=response._id%>"> 
-                                            <img class="default-img" src="/uploads/<%=response.Image%>" alt="">
+                                            <img class="default-img" src="/uploads/<%=response.Image[0]%>" alt="">
                                         </a>
                                     </a>
             
@@ -100,6 +100,17 @@
                                         <span>
                                             <span>95%</span>
                                         </span>
+                                    </div>
+                                    <div >
+                                        <span >
+                                            <span> <% if(response.Quantity>0) {%>
+                                            </span>    <%} else { %>
+                                                Availability:<span class=" ml-5,badge rounded-pill alert-warning"
+                                                >   OUT OF STOCK</span>
+                                                <%} %></span>
+                                        
+                                        </span>
+                        
                                     </div>
                                     <div class="product-price">
                                         <span><%=response.Price%></span>

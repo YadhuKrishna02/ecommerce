@@ -1,52 +1,61 @@
-<header class="header-area header-style-3 header-height-2">
+<header
+  class="header-area header-style-3 header-height-2"
+  style="background-color: whitesmoke"
+>
   <div class="header-middle header-middle-ptb-1 d-none d-lg-block">
     <div class="container">
       <div class="header-wrap">
-        <div class="logo logo-width-1 wow fadeIn animated">
-          <a href="/"
-            ><img
-              src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.pinimg.com%2Foriginals%2Fa4%2F9c%2Ff6%2Fa49cf6a705d2a839dcc519b059eb8398.jpg&f=1&nofb=1&ipt=1fa4d92a4871ba0cf013f3157f0bc300ca13ebca97d247b6aa8000e0041ca501&ipo=images"
-              alt="logo"
-              height="70px"
-              width="50px"
-          /></a>
-        </div>
-        
         <div class="logo logo-width-1">
-          <h3 style="color: #4b4b4b">
-            WHITE <span style="color: #4b4b4b">SPARROW</span>
-          </h3>
+          <h3>WHITE<span style="color: black">SPARROW</span></h3>
         </div>
-     
 
         <div class="header-right">
-             <div class="search-style-2">
-            <form action="/search" method="post"  >
-             
-              <input type="text"  name="search"  id="keyword" placeholder="Search for items..." />
+          <div class="search-style-2">
+            <form action="/search" method="post">
+              <input
+                type="text"
+                name="search"
+                id="keyword"
+                placeholder="Search for items..."
+              />
 
-              <button type="submit"     style="display: none;">Submit</button>
-
+              <button type="submit" style="display: none">Submit</button>
             </form>
           </div>
           <div class="header-action-right">
-            <div class="header-right">
-         
             <div class="header-action-2">
-              <li class="dropdown nav-item" style="list-style: none;">
-                <a data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn5.vectorstock.com%2Fi%2Fthumb-large%2F04%2F09%2Fuser-icon-vector-5770409.jpg&f=1&nofb=1&ipt=cd5c65b1050b3260c6c55079ce0a1e365d19e45e9afde176b8af5c31d2c198d5&ipo=images" height="50rem" width="50rem" alt="User"></a>
-                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
-                     <% if(!locals.userSession){%>
-
-                    <a class="dropdown-item" href="/login" style="color: black">Log In</a>
-
-                     <%} else{%>
-                 <a class="dropdown-item" href="/profile/<%=locals.profileId%>">Edit Profile</a>
-              <a class="dropdown-item" href="/logout" style="color: red">Log out</a>
-
-              <%} %>
+              <li class="dropdown nav-item" style="list-style: none">
+                <a
+                  data-bs-toggle="dropdown"
+                  href="#"
+                  id="dropdownAccount"
+                  aria-expanded="false"
+                >
+                  <img
+                    class="img-xs rounded-circle"
+                    src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn5.vectorstock.com%2Fi%2Fthumb-large%2F04%2F09%2Fuser-icon-vector-5770409.jpg&f=1&nofb=1&ipt=cd5c65b1050b3260c6c55079ce0a1e365d19e45e9afde176b8af5c31d2c198d5&ipo=images"
+                    height="50rem"
+                    width="50rem"
+                    alt="User"
+                /></a>
+                <div
+                  class="dropdown-menu dropdown-menu-end"
+                  aria-labelledby="dropdownAccount"
+                >
+                  <% if(!locals.userSession){%>
+                  <a class="dropdown-item" href="/login" style="color: black"
+                    >Log In</a
+                  >
+                  <%} else{%>
+                  <a class="dropdown-item" href="/profile/<%=locals.profileId%>"
+                    >Edit Profile</a
+                  >
+                  <a class="dropdown-item" href="/logout" style="color: red"
+                    >Log out</a
+                  >
+                  <%} %>
                 </div>
-            </li>
+              </li>
               <div class="header-action-icon-2">
                 <a href="/view_wishlist">
                   <img
@@ -55,9 +64,9 @@
                     src="assets/imgs/theme/icons/icon-heart.svg"
                   />
                   <% if(locals.userSession){%>
-                  <span class="pro-count blue" id="wishlist-count">
-                    <%= locals.wishcount %>
-                  </span>
+                  <span class="pro-count blue" id="wish-count"
+                    ><%= locals.wishCount %></span
+                  >
                   <%}%>
                 </a>
               </div>
@@ -76,7 +85,7 @@
                 </a>
               </div>
             </div>
-      
+            <div></div>
           </div>
         </div>
       </div>
@@ -91,7 +100,6 @@
           <h4>WHITE<span style="color: black">SPARROW</span></h4>
           <a href="/"></a>
         </div>
-        
         <div class="header-nav d-none d-lg-flex">
           <div
             class="main-menu main-menu-padding-1 main-menu-lh-2 d-none d-lg-block"
@@ -108,85 +116,34 @@
                 <li class="position-static">
                   <a href="/order">Orders <i class=""></i></a>
                 </li>
-                <li>
-                  <a href="blog-category-grid.html">About <i class=""></i></a>
-                </li>
-
-                <li>
-                  <a href="page-contact.html">Contact</a>
-                </li>
               </ul>
             </nav>
           </div>
         </div>
 
-        <p class="mobile-promotion">
-          Happy <span class="text-brand">Mother's Day</span>. Big Sale Up to 40%
-        </p>
+        <p class="mobile-promotion"></p>
         <div class="header-action-right d-block d-lg-none">
           <div class="header-action-2">
             <div class="header-action-icon-2">
-              <a href="shop-wishlist.html">
+              <a href="/view_wishlist">
                 <img alt="Evara" src="assets/imgs/theme/icons/icon-heart.svg" />
-                <span class="pro-count white">4</span>
+                <% if(locals.userSession){%>
+                <span class="pro-count blue" id="wish-count"
+                  ><%= locals.wishCount %></span
+                >
+                <%}%>
               </a>
             </div>
             <div class="header-action-icon-2">
-              <a class="mini-cart-icon" href="shop-cart.html">
+              <a class="mini-cart-icon" href="/view_cart">
                 <img alt="Evara" src="assets/imgs/theme/icons/icon-cart.svg" />
-                <span class="pro-count white">2</span>
+                <% if(locals.userSession){%>
+
+                <span class="pro-count blue" id="cart-count"
+                  ><%= locals.count %></span
+                >
+                <%}%>
               </a>
-              <div class="cart-dropdown-wrap cart-dropdown-hm2">
-                <ul>
-                  <li>
-                    <div class="shopping-cart-img">
-                      <a href="shop-product-right.html"
-                        ><img
-                          alt="Evara"
-                          src="assets/imgs/shop/thumbnail-3.jpg"
-                      /></a>
-                    </div>
-                    <div class="shopping-cart-title">
-                      <h4>
-                        <a href="shop-product-right.html"
-                          >Plain Striola Shirts</a
-                        >
-                      </h4>
-                      <h3><span>1 × </span>$800.00</h3>
-                    </div>
-                    <div class="shopping-cart-delete">
-                      <a href="#"><i class="fi-rs-cross-small"></i></a>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="shopping-cart-img">
-                      <a href="shop-product-right.html"
-                        ><img
-                          alt="Evara"
-                          src="assets/imgs/shop/thumbnail-4.jpg"
-                      /></a>
-                    </div>
-                    <div class="shopping-cart-title">
-                      <h4>
-                        <a href="shop-product-right.html">Macbook Pro 2022</a>
-                      </h4>
-                      <h3><span>1 × </span>$3500.00</h3>
-                    </div>
-                    <div class="shopping-cart-delete">
-                      <a href="#"><i class="fi-rs-cross-small"></i></a>
-                    </div>
-                  </li>
-                </ul>
-                <div class="shopping-cart-footer">
-                  <div class="shopping-cart-total">
-                    <h4>Total <span>$383.00</span></h4>
-                  </div>
-                  <div class="shopping-cart-button">
-                    <a href="shop-cart.html">View cart</a>
-                    <a href="shop-checkout.html">Checkout</a>
-                  </div>
-                </div>
-              </div>
             </div>
             <div class="header-action-icon-2 d-block d-lg-none">
               <div class="burger-icon burger-icon-white">
@@ -201,4 +158,86 @@
     </div>
   </div>
 </header>
+<div class="mobile-header-active mobile-header-wrapper-style">
+  <div class="mobile-header-wrapper-inner">
+    <div class="mobile-header-top">
+      <div class="mobile-header-logo">
+        <h4>WHITE<span style="color: black">SPARROW</span></h4>
+        <a href="/"></a>
+      </div>
+      <div
+        class="mobile-menu-close close-style-wrap close-style-position-inherit"
+      >
+        <button class="close-style search-close">
+          <i class="icon-top"></i>
+          <i class="icon-bottom"></i>
+        </button>
+      </div>
+    </div>
+    <div class="mobile-header-content-area">
+      <div class="mobile-search search-style-3 mobile-header-border">
+        <form action="/search" method="post">
+          <input
+            type="text"
+            name="search"
+            id="keyword"
+            placeholder="Search for items..."
+          />
 
+          <button type="submit" style="display: none">Submit</button>
+        </form>
+      </div>
+      <div class="mobile-menu-wrap mobile-header-border">
+        <!-- mobile menu start -->
+        <nav>
+          <ul class="mobile-menu">
+            <li class="menu-item-has-children">
+              <span class="menu-expand"></span><a href="/">Home</a>
+            </li>
+            <li class="menu-item-has-children">
+              <span class="menu-expand"></span><a href="/shop">Shop</a>
+            </li>
+            <li class="menu-item-has-children">
+              <span class="menu-expand"></span><a href="/order">Orders</a>
+            </li>
+          </ul>
+        </nav>
+        <!-- mobile menu end -->
+      </div>
+      <div class="mobile-header-info-wrap mobile-header-border">
+        <div class="single-mobile-header-info mt-30">
+          <% if(!locals.userSession){%>
+
+          <a href="/login" style="color: black">Log In</a>
+
+          <%} else{%>
+
+          <a href="/profile/<%=locals.profileId%>" style="color: black"
+            >Profile</a
+          >
+          <a href="/logout" style="color: black">Logout</a>
+
+          <%} %>
+        </div>
+      </div>
+      <div class="mobile-social-icon">
+        <h5 class="mb-15 text-grey-4">Follow Us</h5>
+        <a href="#"
+          ><img src="assets/imgs/theme/icons/icon-facebook.svg" alt=""
+        /></a>
+        <a href="#"
+          ><img src="assets/imgs/theme/icons/icon-twitter.svg" alt=""
+        /></a>
+        <a href="#"
+          ><img src="assets/imgs/theme/icons/icon-instagram.svg" alt=""
+        /></a>
+        <a href="#"
+          ><img src="assets/imgs/theme/icons/icon-pinterest.svg" alt=""
+        /></a>
+        <a href="#"
+          ><img src="assets/imgs/theme/icons/icon-youtube.svg" alt=""
+        /></a>
+      </div>
+    </div>
+  </div>
+</div>

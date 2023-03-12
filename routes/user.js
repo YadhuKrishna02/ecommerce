@@ -63,6 +63,8 @@ router.get('/add_to_cart/:id', middleware.userSession, controllers.getAddToCart)
 
 router.get("/view_cart", middleware.userSession, controllers.getViewCart);
 
+router.post('/view-cart', middleware.userSession, controllers.postCart)
+
 router.put("/change_product_quantity", middleware.userSession, controllers.postchangeProductQuantity);
 
 router.delete("/delete_cart_item", middleware.userSession, controllers.getDeleteCart);
@@ -103,11 +105,8 @@ router.get('/order_success', middleware.userSession, controllers.getSuccessPage)
 //**********COUPON STARTS HERE************** */
 //************************************************************ */
 
-router.post("/apply_coupon", middleware.userSession, controllers.applyCoupon);
+router.post('/validate_coupon', middleware.userSession, controllers.validateCoupon)
 
-router.get('/coupon_validator', middleware.userSession, controllers.couponValidator)
-
-router.get("/coupon_verify", middleware.userSession, controllers.couponVerify);
 
 
 //************************************************************ */

@@ -43,7 +43,8 @@ module.exports = {
                     },
                     {
                         $set: {
-                            ['orders.' + orderIndex + '.paymentStatus']: 'PAID'
+                            ['orders.' + orderIndex + '.paymentStatus']: 'Paid',
+                            ['orders.' + orderIndex + '.orderStatus']: 'Success'
                         }
                     }
                 ),

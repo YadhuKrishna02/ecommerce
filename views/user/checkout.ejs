@@ -132,7 +132,7 @@
                 <% cartItems.forEach(function(cartItems){%>
                 <tr>
                   <td class="image product-thumbnail">
-                    <img src="/uploads/<%=cartItems.cartItems.Image %>" />
+                    <img src="/uploads/<%=cartItems.cartItems.Image[0] %>" />
                   </td>
                   <td>
                     <h5>
@@ -162,9 +162,13 @@
                 </tr>
               </tbody>
             </table>
-          </div>
+           
         </div>
       </div>
+      <br>
+      <br>
+      
+      
     </div>
   </div>
 </section>
@@ -305,4 +309,6 @@
       },
     });
   }
+          
+  
 </script>

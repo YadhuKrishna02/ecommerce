@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-
-
 const userschema = new mongoose.Schema({
   username: {
     type: String,
@@ -158,7 +156,7 @@ const orderSchema = new mongoose.Schema({
       default: new Date()
     },
     orderStatus: {
-      type: String, default: "success"
+      type: String,
     },
   }
   ]
@@ -174,7 +172,11 @@ const couponSchema = new mongoose.Schema({
   minPurchase: Number,
   discountPercentage: Number,
   maxDiscountValue: Number,
-  active: {
+  couponApplied: {
+    type: String,
+    default: false
+  },
+  isActive: {
     type: Boolean,
     default: false
   },

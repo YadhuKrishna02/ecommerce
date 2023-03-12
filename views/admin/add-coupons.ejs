@@ -37,7 +37,7 @@
               <div class="form-group row">
                 <label class="col-sm-3 col-form-label">Min Purchase </label>
                 <div class="col-sm-9">
-                  <input id="minAmount" type="text" class="form-control" />
+                  <input id="minAmount" type="text" class="form-control" onkeyup="validateMinAmount"/>
                 </div>
               </div>
             </div>
@@ -108,9 +108,9 @@
         error.style.background = 'rgb(200,0,0,0.1)'
         error.style.width = "100%"
         flag = 2
-      } else if (minAmount == '') {
+      } else if (minAmount == '' || minAmount.length==0 ||!minAmount.match(/^\d+(\.\d{1,2})?$/)) {
         error.removeAttribute('hidden')
-        error.innerText = 'min amount is required'
+        error.innerText = 'min amount is not valid'
         error.style.background = 'rgb(200,0,0,0.1)'
         error.style.width = "100%"
         flag = 2
@@ -139,6 +139,13 @@
           error.style.width = "100%"
           flag = 2
         }
+        else if(discountPercentage==''|| discountPercentage.length==0 ||!discountPercentage.match(/^\d+(\.\d{1,2})?$/)){
+          error.removeAttribute('hidden')
+        error.innerText = 'Discount percent is not valid'
+        error.style.background = 'rgb(200,0,0,0.1)'
+        error.style.width = "100%"
+        flag = 2
+        }
       } else if (maxDiscountValue > (minAmount * discountPercentage / 100)) {
         error.removeAttribute('hidden')
         console.log(minAmount * discountPercentage / 100);
@@ -146,15 +153,15 @@
         error.style.background = 'rgb(200,0,0,0.1)'
         error.style.width = "100%"
         flag = 2
-      } else if (maxDiscountValue == '') {
+      } else if (maxDiscountValue == '' || maxDiscountValue.length==0 ||!maxDiscountValue.match(/^\d+(\.\d{1,2})?$/)) {
         error.removeAttribute('hidden')
-        error.innerText = 'Max Discount value is required'
+        error.innerText = 'Max Discount value is not valid'
         error.style.background = 'rgb(200,0,0,0.1)'
         error.style.width = "100%"
         flag = 2
-      } else if (description == '') {
+      } else if (description == ''||description.length==0) {
         error.removeAttribute('hidden')
-        error.innerText = 'description is required'
+        error.innerText = 'description is not valid'
         error.style.background = 'rgb(200,0,0,0.1)'
         error.style.width = "100%"
         flag = 2

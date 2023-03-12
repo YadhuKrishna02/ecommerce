@@ -140,6 +140,20 @@
                       </a>
                     </div>
                   </div>
+                  <ul class="product-meta font-xs color-grey mt-50">
+                    <li>
+                      <% if(data.Quantity>0) {%> Availability:<span
+                        class="in-stock text-success ml-5"
+                        ><%-data.Quantity%></span
+                      >
+                      <%} else { %> Availability:<span
+                        class="in-stock text-danger ml-5"
+                      >
+                        OUT OF STOCK</span
+                      >
+                      <%} %>
+                    </li>
+                  </ul>
                 </div>
                 <!-- Detail Info -->
               </div>

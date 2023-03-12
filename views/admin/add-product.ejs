@@ -5,12 +5,13 @@
         <h2 class="text-center">Add Product</h2>
         <form
           name="myform"
-          onsubmit="return validation()"
+          onsubmit="return validateImage()"
+          id="form"
           action="/admin/add_product"
           method="POST"
           enctype="multipart/form-data"
         >
-          <label for="">Prodcut Name</label>
+          <label for="">Product Name</label>
           <input
             required
             type="text"
@@ -26,15 +27,23 @@
             required
             type="text"
             name="description"
-            id="discription"
+            id="description"
             class="form-control"
-            onkeyup="validateDiscription()"
+            onkeyup="validateDescription()"
           />
-          <span id="discription-error" class="validation-label"></span>
+          <span id="description-error" class="validation-label"></span>
           <br />
 
           <label for="">Price</label>
-          <input type="text" required name="price" class="form-control" />
+          <input
+            type="text"
+            required
+            name="price"
+            class="form-control"
+            id="price"
+            onkeyup="validatePrice()"
+          />
+          <span id="price-error" class="validation-label"></span>
 
           <label for="">Category</label>
 
@@ -47,7 +56,15 @@
           </select>
 
           <label for="">Quantity</label>
-          <input type="text" name="quantity" value="1" class="form-control" />
+          <input
+            type="text"
+            name="quantity"
+            value="1"
+            class="form-control"
+            id="quantity"
+            onkeyup="validateQuantity()"
+          />
+          <span id="quantity-error" class="validation-label"></span>
 
           <label for="">Image</label>
           <input
@@ -68,13 +85,13 @@
 </section>
 
 <script>
-  let img = document.forms['myform']['file'];
-  let validExt = ['jpeg', 'png', 'jpg', 'webp'];
-  function validation() {
+  const img = document.forms['myform']['file'];
+  const validExt = ['jpeg', 'png', 'jpg', 'webp'];
+  function validateImage() {
     if (img.value !== '') {
-      let dot_pos = img.value.lastIndexOf('.') + 1;
-      let img_ext = img.value.substring(dot_pos);
-      let result = validExt.includes(img_ext);
+      const dot_pos = img.value.lastIndexOf('.') + 1;
+      const img_ext = img.value.substring(dot_pos);
+      const result = validExt.includes(img_ext);
       if (result == false) {
         swal.fire('OOPs!', 'Selected file is not an image!', 'error');
         return false;
@@ -97,53 +114,119 @@
     return true;
   }
 
-  let nameError = document.getElementById('name-error');
-  let discritionError = document.getElementById('discription-error');
-  const regex = /^[^ ].*/;
+  const nameError = document.getElementById('name-error');
+  const descriptionError = document.getElementById('description-error');
+  const priceError = document.getElementById('price-error');
+  const quantityError = document.getElementById('quantity-error');
+  const formError = document.getElementById('form-error');
+  const form = document.getElementById('form');
+
   function validateName() {
-    console.log('lllll');
-    var name = document.getElementById('name').value;
-    var nameInput = document.getElementById('name');
-    console.log(name);
+    const name = document.getElementById('name').value;
+    const nameInput = document.getElementById('name');
+
     if (name.length == 0) {
       nameError.innerHTML = 'Name is required';
       nameError.style.color = 'red';
       nameInput.style.border = 'solid 2px red';
       return false;
     }
-    if (!name.match(regex)) {
+    if (!name.match(/^[A-Z a-z]{3,}$/)) {
       nameError.innerHTML = 'Write valid name';
       nameError.style.color = 'red';
       nameInput.style.border = 'solid 2px red';
+
       return false;
     }
     nameError.innerHTML = '';
     // nameError.innerHTML = "Valid Name";
     nameError.style.color = 'green';
     nameInput.style.border = 'solid 2px green';
+
     return true;
   }
-  function validateDiscription() {
-    console.log('lllll');
-    var name = document.getElementById('discription').value;
-    var nameInput = document.getElementById('discription');
+  function validateDescription() {
+    const description = document.getElementById('description').value;
+    const descriptionInput = document.getElementById('description');
     console.log(name);
-    if (name.length == 0) {
-      discritionError.innerHTML = 'Discription is required';
-      discritionError.style.color = 'red';
+    if (description.length == 0) {
+      descriptionError.innerHTML = 'Discription is required';
+      descriptionError.style.color = 'red';
+      descriptionInput.style.border = 'solid 2px red';
+      return false;
+    }
+    if (!description.match(/^[A-Z a-z]{3,}$/)) {
+      descriptionError.innerHTML = 'Write valid discription';
+      descriptionError.style.color = 'red';
       nameInput.style.border = 'solid 2px red';
       return false;
     }
-    if (!name.match(regex)) {
-      discritionError.innerHTML = 'Write valid discription';
-      discritionError.style.color = 'red';
-      nameInput.style.border = 'solid 2px red';
-      return false;
-    }
-    discritionError.innerHTML = '';
+    descriptionError.innerHTML = '';
     // nameError.innerHTML = "Valid Name";
-    discritionError.style.color = 'green';
-    nameInput.style.border = 'solid 2px green';
+    descriptionError.style.color = 'green';
+    descriptionInput.style.border = 'solid 2px green';
     return true;
   }
+  function validatePrice() {
+    const price = document.getElementById('price').value;
+    const priceInput = document.getElementById('price');
+    if (price.length == 0) {
+      priceError.innerHTML = 'Price field is required';
+      priceError.style.color = 'red';
+      priceInput.style.border = 'solid 2px red';
+      return false;
+    }
+    if (!price.match(/^\d+(\.\d{1,2})?$/)) {
+      priceError.innerHTML = 'Write valid price';
+      priceError.style.color = 'red';
+      nameInput.style.border = 'solid 2px red';
+      return false;
+    }
+    priceError.innerHTML = '';
+    // nameError.innerHTML = "Valid Name";
+    priceError.style.color = 'green';
+    priceInput.style.border = 'solid 2px green';
+    return true;
+  }
+  function validateQuantity() {
+    const quantity = document.getElementById('quantity').value;
+    const quantityInput = document.getElementById('quantity');
+    console.log(name);
+    if (quantity.length == 0) {
+      quantityError.innerHTML = 'quantity field is required';
+      quantityError.style.color = 'red';
+      quantityInput.style.border = 'solid 2px red';
+      return false;
+    }
+    if (!quantity.match(/^[1-9]\d*$/)) {
+      quantityError.innerHTML = 'Write valid quantity';
+      quantityError.style.color = 'red';
+      nameInput.style.border = 'solid 2px red';
+      return false;
+    }
+    quantityError.innerHTML = '';
+    // nameError.innerHTML = "Valid Name";
+    quantityError.style.color = 'green';
+    quantityInput.style.border = 'solid 2px green';
+    return true;
+  }
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (
+      !validatePrice() ||
+      !validateQuantity() ||
+      !validateDescription() ||
+      !validateImage() ||
+      !validateName()
+    ) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Enter details correctly!!',
+      });
+      return false;
+    } else {
+      form.submit();
+    }
+  });
 </script>
