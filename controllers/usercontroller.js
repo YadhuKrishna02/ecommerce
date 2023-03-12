@@ -650,7 +650,7 @@ module.exports = {
     try {
       await userhelpers.category(req.query.cname).then(async (response) => {
         let category2 = await adminHelper.viewAddCategory()
-        console.log(category, 'dfffffffffffffffff');
+        console.log(category2, 'dfffffffffffffffff');
         if (response) {
 
           res.render('user/shop-new2', { userSession, profileId, response, category2, wishcount, count })
@@ -705,29 +705,29 @@ module.exports = {
 
   getSearch: async (req, res) => {
 
-    let category = await adminHelper.viewAddCategory()
+    let viewCategory = await adminHelper.viewAddCategory()
 
 
     userhelpers.productSearch(req.body).then((response) => {
       if (response) {
 
-        res.render('user/shop-new', { userSession, profileId, response, category, wishcount, count })
+        res.render('user/shop-new', { userSession, profileId, response, viewCategory, wishcount, count })
         console.log(response);
       }
     }).catch((err) => {
       console.log(err);
-      res.render('user/shop-new', { err, userSession, profileId, category, wishcount, count })
+      res.render('user/shop-new', { err, userSession, profileId, viewCategory, wishcount, count })
 
     })
   },
 
   postSort: async (req, res) => {
     let sortOption = req.body['selectedValue'];
-    let category = await adminHelper.viewAddCategory()
+    let viewCategory = await adminHelper.viewAddCategory()
     userhelpers.postSort(sortOption).then((response) => {
       if (response) {
 
-        res.render('user/shop-new', { response, userSession, profileId, category, count, wishcount })
+        res.render('user/shop-new', { response, userSession, profileId, viewCategory, count, wishcount })
       }
     })
   },

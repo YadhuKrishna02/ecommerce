@@ -151,7 +151,7 @@
                     <div class="widget-category mb-30">
                         <h5 class="section-title style-1 mb-30 wow fadeIn animated">Category</h5>
                         <ul class="categories">
-                            <% category.forEach(function(response,index) { %>
+                            <% viewCategory.forEach(function(response,index) { %>
                             <li><a href="/category?cname=<%= response.categoryName%>"><%= response.categoryName%></a></li>
                          <% }) %>
                             
