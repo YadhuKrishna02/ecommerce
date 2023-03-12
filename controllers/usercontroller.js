@@ -648,6 +648,7 @@ module.exports = {
   category: async (req, res) => {
     try {
       category = await adminHelper.viewAddCategory()
+      console.log(category, 'dfffffffffffffffff');
 
       await userhelpers.category(req.query.cname).then((response) => {
         if (response) {
