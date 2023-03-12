@@ -648,7 +648,7 @@ module.exports = {
   category: async (req, res) => {
     try {
       await userhelpers.category(req.query.cname).then(async (response) => {
-        category = await adminHelper.viewAddCategory()
+        let category = await adminHelper.viewAddCategory()
         console.log(category, 'dfffffffffffffffff');
         if (response) {
 
