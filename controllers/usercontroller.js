@@ -647,10 +647,9 @@ module.exports = {
 
   category: async (req, res) => {
     try {
-      category = await adminHelper.viewAddCategory()
-      console.log(category, 'dfffffffffffffffff');
-
-      await userhelpers.category(req.query.cname).then((response) => {
+      await userhelpers.category(req.query.cname).then(async (response) => {
+        category = await adminHelper.viewAddCategory()
+        console.log(category, 'dfffffffffffffffff');
         if (response) {
 
           res.render('user/shop-new', { response, userSession, category, wishcount, count })
