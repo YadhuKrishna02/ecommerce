@@ -653,7 +653,7 @@ module.exports = {
         console.log(category, 'dfffffffffffffffff');
         if (response) {
 
-          res.render('user/shop-new', { userSession, response, category, wishcount, count })
+          res.render('user/shop-new', { userSession, profileId, response, category, wishcount, count })
         }
 
       })
@@ -711,12 +711,12 @@ module.exports = {
     userhelpers.productSearch(req.body).then((response) => {
       if (response) {
 
-        res.render('user/shop-new', { userSession, response, category, wishcount, count })
+        res.render('user/shop-new', { userSession, profileId, response, category, wishcount, count })
         console.log(response);
       }
     }).catch((err) => {
       console.log(err);
-      res.render('user/shop-new', { err, userSession, category, wishcount, count })
+      res.render('user/shop-new', { err, userSession, profileId, category, wishcount, count })
 
     })
   },
@@ -727,7 +727,7 @@ module.exports = {
     userhelpers.postSort(sortOption).then((response) => {
       if (response) {
 
-        res.render('user/shop-new', { response, category, count, wishcount })
+        res.render('user/shop-new', { response, userSession, profileId, category, count, wishcount })
       }
     })
   },
