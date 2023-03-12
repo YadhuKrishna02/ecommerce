@@ -649,11 +649,11 @@ module.exports = {
     let userSession = req.session.user.id
     try {
       await userhelpers.category(req.query.cname).then(async (response) => {
-        let category = await adminHelper.viewAddCategory()
+        let category2 = await adminHelper.viewAddCategory()
         console.log(category, 'dfffffffffffffffff');
         if (response) {
 
-          res.render('user/shop-new', { userSession, profileId, response, category, wishcount, count })
+          res.render('user/shop-new2', { userSession, profileId, response, category2, wishcount, count })
         }
 
       })
