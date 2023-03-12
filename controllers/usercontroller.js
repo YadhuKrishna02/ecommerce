@@ -652,7 +652,7 @@ module.exports = {
         console.log(category, 'dfffffffffffffffff');
         if (response) {
 
-          res.render('user/shop-new', { response, userSession, category, wishcount, count })
+          res.render('user/shop-new', { userSession, response, category, wishcount, count })
         }
 
       })
@@ -715,7 +715,7 @@ module.exports = {
       }
     }).catch((err) => {
       console.log(err);
-      res.render('user/shop-new', { err, category, wishcount, count })
+      res.render('user/shop-new', { err, userSession, category, wishcount, count })
 
     })
   },
