@@ -646,6 +646,7 @@ module.exports = {
 
 
   category: async (req, res) => {
+    let userSession = req.session.user.id
     try {
       await userhelpers.category(req.query.cname).then(async (response) => {
         let category = await adminHelper.viewAddCategory()
