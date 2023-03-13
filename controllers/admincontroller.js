@@ -235,10 +235,77 @@ module.exports = {
   //posteditaddproduct
 
   postEditAddProduct: (req, res) => {
+    const images = []
+    if (!req.files.image1) {
+      let image1 = req.body.image1
+      req.files.image1 = [{
+        fieldname: 'image1',
+        originalname: req.body.image1,
+        encoding: '7bit',
+        mimetype: 'image/jpeg',
+        destination: 'public/uploads',
+        filename: req.body.image1,
+        path: ` public\\uploads\\${image1}`,
+      }]
+    }
+    if (!req.files.image2) {
+      let image2 = req.body.image2
+      req.files.image2 = [{
+        fieldname: 'image2',
+        originalname: req.body.image2,
+        encoding: '7bit',
+        mimetype: 'image/jpeg',
+        destination: 'public/uploads',
+        filename: req.body.image2,
+        path: `public\\uploads\\${image2}`,
+      }]
+    }
+    if (!req.files.image3) {
+      let image3 = req.body.image3
+      req.files.image3 = [{
+        fieldname: 'image3',
+        originalname: req.body.image3,
+        encoding: '7bit',
+        mimetype: 'image/jpeg',
+        destination: 'public/uploads',
+        filename: req.body.image3,
+        path: `public\\uploads\\${image3}`,
+      }]
+    }
+    if (!req.files.image4) {
+
+      let image4 = req.body.image4
+      req.files.image4 = [{
+        fieldname: 'image4',
+        originalname: req.body.image4,
+        encoding: '7bit',
+        mimetype: 'image/jpeg',
+        destination: 'public/uploads',
+        filename: req.body.image4,
+        path: `public\\uploads\\${image4}`,
+      }]
+
+    }
+
+    if (req.files) {
+      Object.keys(req?.files).forEach((key) => {
+        if (Array.isArray(req?.files[key])) {
+          req?.files[key]?.forEach((file) => {
+            images.push(file.filename);
+          });
+        } else {
+          images.push(req?.files[key]?.filename);
+        }
+      });
+    }
+
     adminHelper
-      .postEditProduct(req.params.id, req.body, req?.file?.filename)
+      .postEditProduct(req.params.id, req.body, images)
       .then((response) => {
         res.redirect("/admin/view_product");
+      })
+      .catch((err) => {
+        res.status(500).send('Internal server error');
       });
   },
 

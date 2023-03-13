@@ -166,7 +166,9 @@ module.exports = {
         });
     });
   },
-  postEditProduct: (productId, editedData, filename) => {
+
+
+  postEditProduct: (productId, editedData, images) => {
     return new Promise(async (resolve, reject) => {
       await user.product
         .updateOne(
@@ -178,16 +180,17 @@ module.exports = {
               Quantity: editedData.quantity,
               Price: editedData.price,
               category: editedData.category,
-              Image: filename,
+              Image: images,
             },
           }
         )
         .then((response) => {
           resolve(response);
-        });
+        }).catch((err) => {
+          reject(err)
+        })
     });
   },
-
   unlistProduct: (prodId) => {
     return new Promise(async (resolve, reject) => {
       let checkProd = await user.product
