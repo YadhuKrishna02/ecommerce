@@ -1,4 +1,9 @@
 <section class="">
+  <% if(user.length==0){%>
+  <div class="d-flex justify-content-center align-items-center">
+    <h2 class="">No Users Available</h2>
+  </div>
+  <%}else{%>
   <div class="container d-flex justify-content-center">
     <div class="row mt-5">
       <div class="col-md-12">
@@ -12,11 +17,6 @@
     </div>
   </div>
 </section>
-<% if(user.length==0){%>
-<div class="d-flex justify-content-center">
-  <img src="/assets/imgs/banners/empty-cart-1546860808" alt="" />
-</div>
-<%} else{%>
 <!-- Table section -->
 <section mx-auto>
   <div class="card-body">
@@ -30,7 +30,6 @@
                 <th class="align-middle" scope="col">User Name</th>
                 <th class="align-middle" scope="col">Email</th>
                 <th class="align-middle" scope="col">Phone Number</th>
-                <th class="align-middle" scope="col">Orders</th>
                 <th class="align-middle" scope="col">Option</th>
               </tr>
             </thead>
@@ -42,20 +41,13 @@
                 <td><%= user.email %></td>
                 <td><%= user.phonenumber %></td>
                 <td>
-                  <a href="/admin/orders_list" class="btn btn-primary btn-xs"
-                    >Orders</a
-                  >
-                </td>
-                <td>
                   <%if(user.blocked){%>
-
                   <a
                     href="/admin/unblock_users/<%= user._id %>"
                     class="btn btn-success btn-xs"
                     onclick="return confirm('Are you want to block <%= user.username %>?')"
                     >UnBlock</a
                   >
-
                   <%} else{%>
                   <a
                     href="/admin/block_users/<%= user._id %>"
@@ -63,7 +55,6 @@
                     onclick="return confirm('Are you want to block <%= user.username %>?')"
                     >Block</a
                   >
-
                   <%} %>
                 </td>
               </tr>
@@ -74,5 +65,7 @@
       </div>
       <!-- table-responsive end// -->
     </div>
+    <!--  -->
   </div>
+  <%} %>
 </section>
