@@ -92,6 +92,7 @@ module.exports = {
 
 
     await adminHelper.getAllOrders().then((response) => {
+      console.log(response);
 
       let length = response.length
 
@@ -100,6 +101,7 @@ module.exports = {
       for (let i = 0; i < length; i++) {
         total += response[i].orders.totalPrice;
       }
+
       res.render("admin/admin-dashboard", { layout: "adminLayout", variable, adminStatus, length, total, totalProducts, ordersPerDay, paymentCount, paypalCount, totalUserCount });
 
     })
@@ -313,6 +315,7 @@ module.exports = {
   },
   getOrderDetails: (req, res) => {
     adminHelper.orderDetails(req.query.orderid).then((order) => {
+      console.log(order, 'orderrrrrrrrrrrrrrrrrrrr');
       const getDate = (date) => {
         let orderDate = new Date(date);
         let day = orderDate.getDate();

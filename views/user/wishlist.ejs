@@ -9,7 +9,6 @@
               <img src="/assets/imgs/banners/no-wishlist" alt="" />
             </div>
             <%} else{%>
-
             <table class="table shopping-summery text-center">
               <thead>
                 <tr class="main-heading">
@@ -24,28 +23,24 @@
                 <tr>
                   <td class="image product-thumbnail">
                     <img
-                      src="/uploads/<%=wishlistItems.wishlistItems.Image[0] %>"
+                      src="/uploads/<%=wishlistItems.wishlist.Image[0] %>"
                       alt="#"
                     />
                   </td>
                   <td class="product-des product-name">
                     <h5 class="product-name">
-                      <a href="shop-product-right.html"
-                        ><%=wishlistItems.wishlistItems.Productname%></a
-                      >
+                      <a href="shop-product-right.html">
+                        <%=wishlistItems.wishlist.Productname%>
+                      </a>
                     </h5>
                   </td>
                   <td class="price" data-title="Price">
-                    <span><%=wishlistItems.wishlistItems.Price%></span>
+                    <span> <%=wishlistItems.wishlist.Price%> </span>
                   </td>
-
                   <td class="text-right" data-title="Cart">
                     <button
-                      type="button"
-                      aria-label="Add To Cart"
-                      class="action-btn hover-up"
-                      onclick="addtocart('<%-wishlistItems.item%>')
-                      Swal.fire({
+                      class="btn btn-sm"
+                      onclick="addtocart('<%=wishlistItems.item%>');Swal.fire({
                         position: 'center',
                         icon: 'success',
                         title: 'Product is successfully added to cart',
@@ -53,7 +48,7 @@
                         timer: 1500
                       })"
                     >
-                      <i class="fi-rs-shopping-bag-add"></i>
+                      <i class="fi-rs-shopping-bag mr-5"></i>Add to cart
                     </button>
                   </td>
                   <td class="action" cartItemss-title="Remove">
@@ -77,6 +72,7 @@
 </main>
 <script>
   function addtocart(proId) {
+    console.log(proId);
     $.ajax({
       url: '/add_to_cart/' + proId,
       method: 'get',
@@ -84,12 +80,15 @@
         if (response.status) {
           let count = $('#cart-count').html();
           count = parseInt(count) + 1;
+          console.log(count);
           $('#cart-count').html(count);
         }
       },
     });
   }
   function removeItem(wishlistId, prodId) {
+    console.log(wishlistId);
+    console.log(prodId);
     Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",

@@ -4,7 +4,6 @@ module.exports = {
     placeOrder: (orderData, total) => {
         return new Promise(async (resolve, reject) => {
 
-            console.log(orderData);
             let productdetails = await db.cart.aggregate([
                 {
                     $match: {
@@ -61,7 +60,6 @@ module.exports = {
                         }
                     }
                 )
-                console.log(response);
 
             }
 
@@ -83,7 +81,6 @@ module.exports = {
             const items = Address.map((obj) => obj.item);
 
             let orderaddress = items;
-            console.log(orderaddress, '----------------------------');
 
             let status = orderData['payment-method'] === 'COD' ? 'Paid' : 'Pending';
             let orderStatus = orderData['payment-method'] === 'COD' ? 'Success' : 'Pending'
@@ -153,6 +150,7 @@ module.exports = {
 
     cancelOrder: (orderId, userId) => {
 
+        console.log(orderId, 'fdfdjjjjjjjjjjjjjjjjj');
         return new Promise(async (resolve, reject) => {
 
             let orders = await db.order.find({ 'orders._id': orderId })
@@ -161,12 +159,13 @@ module.exports = {
                 {
                     $set:
                     {
-                        ['orders.' + orderIndex + '.OrderStatus']: 'Cancelled'
+                        ['orders.' + orderIndex + '.orderStatus']: 'Cancelled'
 
                     }
 
 
                 }).then(async (orders) => {
+                    console.log(orders, 'dfddddddddddddddd');
 
                     resolve(orders)
                     let cancelledItems = await db.order.aggregate([
@@ -175,7 +174,12 @@ module.exports = {
                         },
                         {
                             $match: {
-                                "orders.OrderStatus": "Cancelled"
+                                "orders._id": ObjectId(orderId)
+                            }
+                        },
+                        {
+                            $match: {
+                                "orders.orderStatus": "Cancelled"
                             }
                         },
                         {
@@ -192,7 +196,7 @@ module.exports = {
 
                     for (let i = 0; i < cancelledItems.length; i++) {
                         if (cancelledItems[i].productDetails.quantity !== 0) { // Check if quantity is defined
-                            let response = await user.product.updateOne(
+                            let response = await db.product.updateOne(
                                 {
                                     _id: cancelledItems[i].productDetails._id
                                 },

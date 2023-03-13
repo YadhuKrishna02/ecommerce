@@ -46,7 +46,7 @@
         <% Details.forEach((order)=>{ %>
       <tr>
         <td><%=order._id%></td>
-        <td><%=order.name%></td>
+        <td><%=order.shippingAddress[0].fname%></td>
         <td><%=order.productDetails[0].productsName%></td>
         <td><%=order.productDetails[0].quantity%></td>
         <td>₹<%=order.productDetails[0].productsPrice%></td>

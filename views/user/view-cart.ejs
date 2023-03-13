@@ -41,18 +41,23 @@
                                         </td>
                                         <td class="price" cartItemss-title="Price"><span><%=cartItems.cartItems.Price%> </span></td>
                                         <td class="text-center" cartItemss-title="Stock">
+                                           <h6 id="stockMessage" class="message" style="color: red;"></h6>
                                     
 
 
 <div class>
     <button class="cart-item-count mr-5" style="background-color:whitesmoke ;" onclick="changeQuantity('<%= cartItems._id%>','<%= cartItems.item %>','<%= userId.id %>',-1)">-</button>
     <span id="<%= cartItems.item %>"><%= cartItems.quantity%></span>
-    <button class="cart-item-count ml-5" onclick="changeQuantity('<%= cartItems._id%>','<%= cartItems.item %>','<%= userId.id %>',1)">+</button>
+      <% if(cartItems.cartItems.Quantity> cartItems.quantity){%>
+                                                     <button class="cart-item-count"
+                                                            onclick="changeQuantity('<%= cartItems._id%>','<%= cartItems.item %>','<%= userId.id %>',1)">+</button>
+                                                        <%}%>
                                             </div>
                                         </td>
-                                        <!-- <td class="text-right" cartItemss-title="cartItems">
-                                            <span>hlo </span>
-                                        </td> -->
+                                             <h2 style="display: none;" id="Quantity">
+                                            <%=cartItems.cartItems.Quantity%>
+                                        </h2>
+                                        
                                         <td class="action" cartItemss-title="Remove"><button class="text-muted" onclick="removeItem('<%-cartItems._id%>','<%-cartItems.item%>')"><i class="fi-rs-trash"></i></button></td>
                                       
                                     </tr>
@@ -153,7 +158,25 @@
 <script>
      function changeQuantity(cartId, prodId,userId,count){
        
-        let quantity = parseInt(document.getElementById(prodId).textContent)
+        let quantity = parseInt(document.getElementById(prodId).textContent);
+            let Quantity = document.getElementById('Quantity').textContent
+        if (quantity+1  === parseInt(Quantity-1)) {
+                document.getElementById('stockMessage').innerHTML = "Only One stock Is Left for This Product"
+            }
+        if (count === 1) {
+            if (quantity + 1 === parseInt(Quantity)) {
+                location.reload();
+            }
+        }
+         console.log(parseInt(Quantity));
+        if (count === -1) {
+            if (quantity  === parseInt(Quantity)) {
+                location.reload();
+            }
+        }
+        setTimeout(function() {
+  document.getElementById("stockMessage").style.display = "none";
+}, 5000);
         count=parseInt(count)
 
         
@@ -166,7 +189,8 @@
         cart: cartId,
         product: prodId,
         count: count,
-        quantity: quantity
+        quantity: quantity,
+        Quantity:Quantity
       
       },
       success:(response)=>{

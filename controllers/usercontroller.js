@@ -284,28 +284,55 @@ module.exports = {
       res.status(500)
     }
   },
-  getWishlist: async (req, res) => {
-    try {
-      wishcount = await wishlistHelper.getWishCount(profileId)
-      wishlistHelper.addToWishlist(req.params.prodId, req.session.user.id).then((data) => {
-        res.json({ status: true });
-      });
-    } catch (error) {
-      res.status(500)
-    }
+  // getWishlist: async (req, res) => {
+  //   try {
+  //     wishcount = await wishlistHelper.getWishCount(profileId)
+  //     wishlistHelper.addToWishlist(req.params.prodId, req.session.user.id).then((data) => {
+  //       res.json({ status: true });
+  //     });
+  //   } catch (error) {
+  //     res.status(500)
+  //   }
 
+  // },
+  getWishlist: (req, res) => {
+
+
+    wishlistHelper
+      .addToWishList(req.query.wishid, req.session.user.id)
+      .then((response) => {
+        res.json(response.status);
+      });
   },
 
-  viewWishlist: async (req, res) => {
+  // viewWishlist: async (req, res) => {
 
-    try {
-      let wishlistItems = await wishlistHelper.viewWishlist(req.session.user.id);
-      console.log(wishlistItems);
-      res.render("user/wishlist", { userSession, profileId, count, wishlistItems, wishcount })
-    } catch (error) {
-      res.status(500)
-    }
+  //   try {
+  //     let wishlistItems = await wishlistHelper.viewWishlist(req.session.user.id);
+  //     console.log(wishlistItems);
+  //     console.log(wishlistItems[1].wishlistItems);
+  //     res.render("user/wishlist", { userSession, profileId, count, wishlistItems, wishcount })
+  //   } catch (error) {
+  //     res.status(500)
+  //   }
 
+  // },
+  listWishList: async (req, res) => {
+
+    await wishlistHelper
+      .ListWishList(req.session.user.id)
+      .then((wishlistItems) => {
+        console.log(wishlistItems);
+        console.log('jjjjjjjjjjjjjjjjjjjj');
+
+        res.render("user/wishlist", {
+          wishlistItems,
+          wishcount,
+          count,
+          userSession,
+          profileId
+        });
+      });
   },
   deleteWishList: async (req, res) => {
     try {
@@ -548,7 +575,7 @@ module.exports = {
 
       await orderHelper.viewOrderDetails(orderId).then(async (response) => {
         let products = response.products[0]
-        let address = response.address
+        let address = response.address[0]
         console.log(address);
         let orderDetails = response.details
         let data = userhelpers.createData(response, getDate)

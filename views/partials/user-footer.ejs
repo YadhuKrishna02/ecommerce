@@ -57,12 +57,17 @@
         <div class="col-lg-2 col-md-3">
           <h5 class="widget-title wow fadeIn animated">My Account</h5>
           <ul class="footer-list wow fadeIn animated">
-            <li><a href="#">Sign In</a></li>
-            <li><a href="#">View Cart</a></li>
-            <li><a href="#">My Wishlist</a></li>
-            <li><a href="#">Track My Order</a></li>
-            <li><a href="#">Help</a></li>
-            <li><a href="#">Order</a></li>
+            <% if(!locals.userSession){%>
+            <li><a href="/login">Login</a></li>
+
+            <%} else{%>
+
+            <li><a href="/logout">Logout</a></li>
+
+            <%} %>
+            <li><a href="/view_cart">View Cart</a></li>
+            <li><a href="/view_wishlist">My Wishlist</a></li>
+            <li><a href="/order">Order</a></li>
           </ul>
         </div>
         <div class="col-lg-4">

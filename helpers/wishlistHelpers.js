@@ -13,89 +13,166 @@ module.exports = {
 
         })
     },
-
-    addToWishlist: async (proId, userId) => {
-
-        const proObj = {
+    addToWishList: (proId, userId) => {
+        let proObj = {
             productId: proId
         };
 
         return new Promise(async (resolve, reject) => {
             let wishlist = await db.wishlist.findOne({ user: userId });
             if (wishlist) {
-                let productExist = wishlist.wishlistItems.findIndex(
+                let productExist = wishlist.wishitems.findIndex(
                     (item) => item.productId == proId
                 );
                 if (productExist == -1) {
-                    db.wishlist
-                        .updateOne(
-                            { user: userId },
-                            {
-                                $addToSet: {
-                                    wishlistItems: proObj
-                                },
-                            }
-                        )
+                    db.wishlist.updateOne({ user: userId },
+                        {
+                            $addToSet: {
+                                wishitems: proObj
+                            },
+                        }
+                    )
                         .then(() => {
-                            resolve();
+                            resolve({ status: true });
                         });
                 }
 
             } else {
                 const newWishlist = new db.wishlist({
                     user: userId,
-                    wishlistItems: proObj
+                    wishitems: proObj
                 });
 
-                await newWishlist.save().then((data) => {
-                    resolve(data);
+                await newWishlist.save().then(() => {
+                    resolve({ status: true });
                 });
             }
         });
     },
 
-    viewWishlist: (userId) => {
+
+    // addToWishlist: async (proId, userId) => {
+
+    //     const proObj = {
+    //         productId: proId
+    //     };
+
+    //     return new Promise(async (resolve, reject) => {
+    //         let wishlist = await db.wishlist.findOne({ user: userId });
+    //         if (wishlist) {
+    //             let productExist = wishlist.wishlistItems.findIndex(
+    //                 (item) => item.productId == proId
+    //             );
+    //             if (productExist == -1) {
+    //                 db.wishlist
+    //                     .updateOne(
+    //                         { user: userId },
+    //                         {
+    //                             $addToSet: {
+    //                                 wishlistItems: proObj
+    //                             },
+    //                         }
+    //                     )
+    //                     .then(() => {
+    //                         resolve();
+    //                     });
+    //             }
+
+    //         } else {
+    //             const newWishlist = new db.wishlist({
+    //                 user: userId,
+    //                 wishlistItems: proObj
+    //             });
+
+    //             await newWishlist.save().then((data) => {
+    //                 resolve(data);
+    //             });
+    //         }
+    //     });
+    // },
+
+    // viewWishlist: (userId) => {
+    //     return new Promise(async (resolve, reject) => {
+    //         const id = await db.wishlist
+    //             .aggregate([
+    //                 {
+    //                     $match: {
+    //                         user: ObjectId(userId),
+    //                     },
+    //                 },
+    //                 {
+    //                     $unwind: "$wishlistItems",
+    //                 },
+
+    //                 {
+    //                     $project: {
+    //                         item: "$wishlistItems.productId",
+    //                     },
+    //                 },
+
+    //                 {
+    //                     $lookup: {
+    //                         from: "products",
+    //                         localField: "item",
+    //                         foreignField: "_id",
+    //                         as: "wish",
+    //                     },
+    //                 },
+    //                 {
+    //                     $project: {
+    //                         item: 1,
+    //                         wishlistItems: { $arrayElemAt: ["$wish", 0] },
+    //                     },
+    //                 },
+    //             ])
+    //             .then((wishlistItems) => {
+
+    //                 resolve(wishlistItems);
+    //             });
+    //     });
+    // },
+
+    ListWishList: (userId) => {
         return new Promise(async (resolve, reject) => {
-            const id = await db.wishlist
-                .aggregate([
-                    {
-                        $match: {
-                            user: ObjectId(userId),
-                        },
-                    },
-                    {
-                        $unwind: "$wishlistItems",
-                    },
 
-                    {
-                        $project: {
-                            item: "$wishlistItems.productId",
-                        },
-                    },
 
-                    {
-                        $lookup: {
-                            from: "products",
-                            localField: "item",
-                            foreignField: "_id",
-                            as: "wish",
-                        },
-                    },
-                    {
-                        $project: {
-                            item: 1,
-                            wishlistItems: { $arrayElemAt: ["$wish", 0] },
-                        },
-                    },
-                ])
-                .then((wishlistItems) => {
-
-                    resolve(wishlistItems);
-                });
-        });
+            await db.wishlist.aggregate([
+                {
+                    $match: {
+                        user: ObjectId(userId)
+                    }
+                },
+                {
+                    $unwind: '$wishitems'
+                },
+                {
+                    $project: {
+                        item: '$wishitems.productId',
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'products',
+                        localField: "item",
+                        foreignField: "_id",
+                        as: 'wishlist'
+                    }
+                },
+                {
+                    $project: {
+                        item: 1, wishlist: { $arrayElemAt: ['$wishlist', 0] }
+                    }
+                },
+            ]).then((wishlist) => {
+                console.log(wishlist);
+                console.log('hhhhhhhhhhhhhhhhh');
+                resolve(wishlist)
+            })
+        })
     },
 
     getDeleteWishList: (body) => {
+        console.log(body);
 
         return new Promise(async (resolve, reject) => {
 
@@ -103,7 +180,7 @@ module.exports = {
                 {
                     "$pull":
 
-                        { wishlistItems: { productId: body.productId } }
+                        { wishitems: { productId: body.productId } }
                 }).then(() => {
                     resolve({ removeProduct: true })
                 })

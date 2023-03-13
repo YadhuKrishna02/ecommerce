@@ -51,9 +51,9 @@ router.get("/logout", middleware.userSession, controllers.getLogout);
 
 //Wishlist starts here
 
-router.get("/add_to_wishlist/:prodId", middleware.userSession, controllers.getWishlist);
+router.get("/add_to_wishlist", middleware.userSession, controllers.getWishlist);
 
-router.get('/view_wishlist', middleware.userSession, controllers.viewWishlist);
+router.get('/view_wishlist', middleware.userSession, controllers.listWishList);
 
 router.delete('/delete_wishlist', middleware.userSession, controllers.deleteWishList)
 

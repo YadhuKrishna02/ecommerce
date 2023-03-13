@@ -241,7 +241,15 @@ module.exports = {
       let order = await user.order.aggregate([
 
         { $unwind: '$orders' },
-        { $match: { "orders.orderStatus": "Success" } }
+        {
+          $match: {
+            $or: [
+              { "orders.orderStatus": "Success" },
+              { "orders.orderStatus": "Delivered" }
+            ]
+          }
+        }
+
 
       ]).then((response) => {
         resolve(response)
