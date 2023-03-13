@@ -707,6 +707,7 @@ module.exports = {
 
   postCart: async (req, res) => {
 
+    console.log('hiiiiiiiiiiiiiiii');
     let couponData = req.body
     console.log(req.body);
     couponName = req.body.couponName
@@ -717,6 +718,7 @@ module.exports = {
         res.redirect("/check_out")
       })
     } else {
+      console.log('hloooooooooooooo');
       res.redirect('/check_out')
     }
 
