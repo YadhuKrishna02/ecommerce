@@ -2,6 +2,7 @@ const adminHelper = require("../helpers/adminHelpers");
 const couponHelpers = require("../helpers/couponHelpers");
 const user = require("../models/connection");
 const swal = require("sweetalert");
+const userhelpers = require("../helpers/userhelpers");
 
 const adminCredential = {
   name: "superAdmin",
@@ -199,15 +200,20 @@ module.exports = {
       res.redirect("/admin/view_product");
     });
   },
-  getViewproduct: (req, res) => {
-
-
-
-    adminHelper.ViewProduct().then((response) => {
+  getViewproduct: async (req, res) => {
+    const pageNum = req.query.page;
+    const currentPage = pageNum;
+    const perPage = 10;
+    const documentCount = await userhelpers.documentCount();
+    let pages = Math.ceil(parseInt(documentCount) / perPage);
+    adminHelper.ViewProduct(pageNum, perPage).then((response) => {
       res.render("admin/view-product", {
         layout: "adminLayout",
         adminStatus,
         response,
+        currentPage,
+        documentCount,
+        pages
       });
     });
   },

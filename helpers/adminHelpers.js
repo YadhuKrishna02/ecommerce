@@ -137,15 +137,15 @@ module.exports = {
       });
     });
   },
-  ViewProduct: () => {
+  ViewProduct: (pageNum, perPage) => {
     return new Promise(async (resolve, reject) => {
       await user.product
         .find()
-        .exec()
+        .skip((pageNum - 1) * perPage).limit(perPage)
         .then((response) => {
-          console.log(response);
           resolve(response);
         });
+
     });
   },
   // deleteViewProduct: (productId) => {
