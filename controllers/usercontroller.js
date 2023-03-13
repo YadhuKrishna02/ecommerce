@@ -355,7 +355,6 @@ module.exports = {
       let count = await cartHelper.getCartItemsCount(req.session.user.id);
 
       let cartItems = await cartHelper.viewCart(req.session.user.id);
-      console.log(cartItems);
 
       res.render("user/view-cart", {
         cartItems,
@@ -431,20 +430,11 @@ module.exports = {
   postcheckOutPage: async (req, res) => {
 
     try {
-      if (req.session.user.finalTotal) {
-        total = req.session.user.finalTotal
-      }
-      else {
 
-        total = await cartHelper.totalCheckOutAmount(req.session.user.id)
-      }
-      req.session.user.finalTotal = null
+      total = await cartHelper.totalCheckOutAmount(req.session.user.id)
+
 
       let order = await orderHelper.placeOrder(req.body, total).then(async (response) => {
-
-
-
-
         if (req.body['payment-method'] == 'COD') {
           res.json({ codstatus: true })
 
@@ -707,9 +697,7 @@ module.exports = {
 
   postCart: async (req, res) => {
 
-    console.log('hiiiiiiiiiiiiiiii');
     let couponData = req.body
-    console.log(req.body);
     couponName = req.body.couponName
     couponTotal = req.body.total
     discountAmount = req.body.discountAmount
@@ -719,7 +707,7 @@ module.exports = {
       })
     } else {
       console.log('hloooooooooooooo');
-      res.redirect('/check_out')
+      res.redirect("/check_out")
     }
 
   },
