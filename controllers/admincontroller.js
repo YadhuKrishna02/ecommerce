@@ -205,7 +205,7 @@ module.exports = {
     const currentPage = pageNum;
     const perPage = 10;
     const documentCount = await userhelpers.documentCount();
-    let pages = Math.ceil(parseInt(documentCount) / perPage);
+    let pages2 = Math.ceil(parseInt(documentCount) / perPage);
     adminHelper.ViewProduct(pageNum, perPage).then((response) => {
       res.render("admin/view-product", {
         layout: "adminLayout",
@@ -213,7 +213,7 @@ module.exports = {
         response,
         currentPage,
         documentCount,
-        pages
+        pages2
       });
     });
   },
