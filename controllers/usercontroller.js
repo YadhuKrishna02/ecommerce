@@ -362,9 +362,10 @@ module.exports = {
         userSession,
         profileId,
         count, wishcount,
-        total, finalTotal
+        total
       });
     } catch (error) {
+      console.log(error);
       res.status(500)
     }
 
