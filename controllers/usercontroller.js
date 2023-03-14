@@ -348,27 +348,21 @@ module.exports = {
   },
 
   getViewCart: async (req, res) => {
-    try {
-      let userId = req.session.user;
-      total = await cartHelper.totalCheckOutAmount(req.session.user.id);
 
-      let count = await cartHelper.getCartItemsCount(req.session.user.id);
+    let userId = req.session.user;
+    let total = await cartHelper.totalCheckOutAmount(req.session.user.id);
+    count = await cartHelper.getCartItemsCount(req.session.user.id);
 
-      let cartItems = await cartHelper.viewCart(req.session.user.id);
-
-      res.render("user/view-cart", {
-        cartItems,
-        userId,
-        userSession,
-        profileId,
-        count, wishcount,
-        total
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(500)
-    }
-
+    let cartItems = await cartHelper.viewCart(req.session.user.id);
+    console.log(cartItems);
+    res.render("user/view-cart", {
+      cartItems,
+      userId,
+      userSession,
+      count,
+      total,
+      wishcount,
+    });
   },
   postchangeProductQuantity: async (req, res) => {
     try {
@@ -698,17 +692,16 @@ module.exports = {
 
   postCart: async (req, res) => {
 
-    let couponData = req.body
+    const couponData = req.body
     couponName = req.body.couponName
     couponTotal = req.body.total
     discountAmount = req.body.discountAmount
     if (couponData.couponName) {
-      await couponHelpers.addCouponIntUseroDb(couponData, req.session.user.id).then((response) => {
+      await userhelpers.addCouponInUseroDb(couponData, req.session.user.id).then((response) => {
         res.redirect("/check_out")
       })
     } else {
-      console.log('hloooooooooooooo');
-      res.redirect("/check_out")
+      res.redirect('/check_out')
     }
 
   },

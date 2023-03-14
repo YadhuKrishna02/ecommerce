@@ -1,7 +1,4 @@
 
-<section></section>
-    
-   
     <main class="main">
        
         <section class="mt-50 mb-50">
@@ -41,23 +38,27 @@
                                         </td>
                                         <td class="price" cartItemss-title="Price"><span><%=cartItems.cartItems.Price%> </span></td>
                                         <td class="text-center" cartItemss-title="Stock">
-                                           <h6 id="stockMessage" class="message" style="color: red;"></h6>
-                                    
-
-
-<div class>
-    <button class="cart-item-count mr-5" style="background-color:whitesmoke ;" onclick="changeQuantity('<%= cartItems._id%>','<%= cartItems.item %>','<%= userId.id %>',-1)">-</button>
-    <span id="<%= cartItems.item %>"><%= cartItems.quantity%></span>
-      <% if(cartItems.cartItems.Quantity> cartItems.quantity){%>
+                                            <h6 id="stockMessage" class="message" style="color: red;"></h6>
+                                            
+                                                <button class="cart-item-count "
+                                                        onclick="changeQuantity('<%= cartItems._id%>','<%= cartItems.item %>','<%= userId.id %>',-1)">-</button>
+                                                
+                                                <span id="<%= cartItems.item %>">
+                                                    <%= cartItems.quantity%>
+                                                </span>
+                                                <% if(cartItems.cartItems.Quantity> cartItems.quantity){%>
                                                      <button class="cart-item-count"
                                                             onclick="changeQuantity('<%= cartItems._id%>','<%= cartItems.item %>','<%= userId.id %>',1)">+</button>
                                                         <%}%>
-                                            </div>
+                                                    
+                                            
                                         </td>
-                                             <h2 style="display: none;" id="Quantity">
+                                        <h2 style="display: none;" id="Quantity">
                                             <%=cartItems.cartItems.Quantity%>
                                         </h2>
-                                        
+                                        <!-- <td class="text-right" cartItemss-title="cartItems">
+                                            <span>hlo </span>
+                                        </td> -->
                                         <td class="action" cartItemss-title="Remove"><button class="text-muted" onclick="removeItem('<%-cartItems._id%>','<%-cartItems.item%>')"><i class="fi-rs-trash"></i></button></td>
                                       
                                     </tr>
@@ -73,36 +74,38 @@
                        
                         <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
                         <div class="row mb-50 d-flex justify-content-center">
-                          <div class="col-lg-12 col-md-12 d-flex justify-content-center">
-            
+                            <div class="col-lg-12 col-md-12 d-flex justify-content-center">
+                               
+                               
                                 
-              <div class="left">
-             
-                               <div class="total-amount">
-                <div class="coupon">
-                  <form >
-                    <div class="form-row row justify-content-center">
-                      <div class="form-group col-lg-9">
-                        <input
-                          id="code"
-                          class="font-medium"
-                          name="coupon"
-                          placeholder="Enter Your Coupon"
-                        />
-                      </div>
-                      <div class="form-group col-lg-3">
-                        <button class="btn btn-sm" type="submit"  onclick="validatecoupon()">
-                          <i class="fi-rs-label mr-10"></i>Apply
-                        </button>
-                      </div>
-                      
-                       <h6 id="couponUsedErr" class="message" style="color: red;"></h6>
-                    </div>
-                  </form>
-                  <span class="couponErr"></span>
-                </div>
-              </div>
-          </div>
+                                <div class="mb-30 mt-50">
+                                    <div class="heading_s1 mb-3">
+                                        <h4>Apply Coupon</h4>
+                                    </div>
+                                    <div class="total-amount">
+                                        <div class="left">
+                                            <div class="coupon">
+                                                <form action="" >
+                                                    <div class="form-row row justify-content-center">
+                                                        <div class="form-group col-lg-9">
+                                                            <input id="code" class="font-medium" name="Coupon" placeholder="Enter Your Coupon">
+                                                        </div>
+                                                        <div class="form-group col-lg-3">
+                                                          <button type="button" class="btn  btn-sm"
+                                                          onclick="validatecoupon()"><i
+                                                              class="fi-rs-label mr-10"></i>Apply</button>
+                              
+                              
+                                                        </div>
+                                                        <h6 id="successMesage"></h6>
+                                                        <h6 id="couponUsedErr" class="message" style="color: red;"></h6>
+                                                    </div>
+                                                </form>
+                                                <span class="couponErr"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-lg-6 col-md-12">
                                 <div class="border p-md-4 p-30 border-radius cartItems-totals">
@@ -121,25 +124,29 @@
                                                     <td class="cartItems_total_amount"> <i class="ti-gift mr-5"></i> Free Shipping</td>
                                                 </tr>
                                                 <tr>
+                                                  <td class="cartItems_total_label">Discount Amount</td>
+                                                  <td class="cartItems_total_amount" id="discountAmount"> <i class="ti-gift mr-5"></i> ₹0</td>
+                                              </tr>
+                                                <tr>
                                                     <td class="cartItems_total_label">Total</td>
                                                     <td class="cartItems_total_amount"><strong>₹<span id="total" class="font-xl fw-900 text-brand "><%= total%></span></strong></td>
                                                 </tr>
                                             </tbody>
                                         </table>
-            
+                                        <form class="form-sample" action="/view_cart" method="POST">
+                                          <input type="hidden" name="total" id="checkTotal" value="">
+                                          <input type="hidden" name="couponName" id="couponName" value="">
+                                          <input type="hidden" name="discountAmount" id="couponDiscountAmount" value="">
+                                          <% if(locals.cartItems[0].cartItems.Quantity>0){%>
+                                          <button type="submit" class="btn "><i class="fi-rs-box-alt mr-10"></i>Proceed To
+                                              CheckOut</button>
+                                              <%} else{%>
+                                                    <p class="text-danger"> This product is currently out of stock</p>
+      
+                                                  <%} %>
+                                      </form>
                                     </div>
-                                      <form class="form-sample" action="/view_cart" method="POST">
-                                        <input type="hidden" name="total" id="checkTotal">
-                                        <input type="hidden" name="couponName" id="couponName">
-                                        <input type="hidden" name="discountAmount" id="couponDiscountAmount">
-                                        <% if(locals.cartItems[0].cartItems.Quantity>0){%>
-                                        <button type="submit" class="btn "><i class="fi-rs-box-alt mr-10"></i>Proceed To
-                                            CheckOut</button>
-                                            <%} else{%>
-                                                  <p class="text-danger"> This Product Is  Currently Out Of Stock</p>
-    
-                                                <%} %>
-                                    </form>
+                                    <!-- <a href="/check_out" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a> -->
                                 </div>
                             </div>
                         </div>
@@ -157,9 +164,8 @@
 </section>
 <script>
      function changeQuantity(cartId, prodId,userId,count){
-       
-        let quantity = parseInt(document.getElementById(prodId).textContent);
-            let Quantity = document.getElementById('Quantity').textContent
+        let quantity = parseInt(document.getElementById(prodId).textContent)
+        let Quantity = document.getElementById('Quantity').textContent
         if (quantity+1  === parseInt(Quantity-1)) {
                 document.getElementById('stockMessage').innerHTML = "Only One stock Is Left for This Product"
             }
@@ -168,7 +174,6 @@
                 location.reload();
             }
         }
-         console.log(parseInt(Quantity));
         if (count === -1) {
             if (quantity  === parseInt(Quantity)) {
                 location.reload();
@@ -178,9 +183,7 @@
   document.getElementById("stockMessage").style.display = "none";
 }, 5000);
         count=parseInt(count)
-
         
-
         $.ajax({
         url: '/change_product_quantity',
         method: 'PUT',
@@ -190,7 +193,7 @@
         product: prodId,
         count: count,
         quantity: quantity,
-        Quantity:Quantity
+        Quantity: Quantity
       
       },
       success:(response)=>{
@@ -208,11 +211,7 @@
             document.getElementById(prodId).innerHTML=cartQuantity
             document.getElementById("total").innerHTML=response.total
             document.getElementById("subtotal").innerHTML=response.total
-
-
-
         }
-
        
      }
     })
@@ -250,23 +249,22 @@ function removeItem(cartId, prodId) {
 })
    
 }
-
-
- function validatecoupon() {
-                couponname = document.getElementById('cpn').value
+function validatecoupon() {
+                couponname = document.getElementById('code').value
                 $.ajax({
                     url: '/validate_coupon?couponName=' + couponname,
                     method: "POST",
                     success: (response) => {
+                      console.log(response);
                         if (response.discountAmount && response.couponTotal) {
                             document.getElementById('discountAmount').innerHTML = "-" + (response?.discountAmount)
                             document.getElementById('total').innerHTML = response?.couponTotal
-                            document.getElementById('successMesage').innerHTML = response.success
+                            document.getElementById('successMesage').innerHTML = response?.success
                         }
                         const checkTotalInput = document.getElementById('checkTotal');
                         const couponNameInput = document.getElementById('couponName');
                         const couponDiscountInput = document.getElementById('couponDiscountAmount')
-                        checkTotalInput.value = response?.couponTotal;
+                        checkTotalInput.value = response?.couponTotal
                         couponNameInput.value = couponname;
                         couponDiscountInput.value = response?.discountAmount;
                         console.log(couponDiscountInput);
@@ -278,6 +276,4 @@ function removeItem(cartId, prodId) {
                     }
                 })
             }
-
-
 </script>

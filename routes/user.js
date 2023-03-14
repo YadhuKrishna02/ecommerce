@@ -61,9 +61,9 @@ router.get('/product_details/:id', middleware.userSession, controllers.getProduc
 
 router.get('/add_to_cart/:id', middleware.userSession, controllers.getAddToCart)
 
-router.get("/view_cart", middleware.userSession, controllers.getViewCart);
+router.get('/view_cart', middleware.userSession, controllers.getViewCart)
 
-router.post("/view_cart", middleware.userSession, controllers.postCart)
+router.post('/view_cart', middleware.userSession, controllers.postCart)
 
 router.put("/change_product_quantity", middleware.userSession, controllers.postchangeProductQuantity);
 
