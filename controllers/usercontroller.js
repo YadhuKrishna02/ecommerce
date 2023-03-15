@@ -413,7 +413,7 @@ module.exports = {
       checkoutHelper.checkOutpage(req.session.user.id).then((response) => {
 
 
-        res.render('user/checkout', { paypalClientId: process.env.PAYPAL_CLIENT_ID, users, userSession, profileId, cartItems, total, response, wishcount, count })
+        res.render('user/checkout', { users, userSession, profileId, cartItems, total, response, wishcount, count })
       })
     } catch (error) {
       res.status(500)
