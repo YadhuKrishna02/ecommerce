@@ -36,11 +36,13 @@ couponPrice = 0;
 
 module.exports = {
   getHome: async (req, res) => {
+
     try {
 
       userSession = req.session.userLoggedIn;
       if (req.session.userLoggedIn) {
         profileId = req.session.user.id;
+        wishcount = await wishlistHelper.getWishCount(profileId)
         count = await cartHelper.getCartItemsCount(req.session.user.id);
         res.render("user/user", { userSession, wishcount, profileId, count });
       } else {
@@ -243,7 +245,7 @@ module.exports = {
       let currentPage = pageNum
       let perPage = 6
       // let currentUserId=req.session.user.id
-
+      wishcount = await wishlistHelper.getWishCount(profileId)
       count = await cartHelper.getCartItemsCount(req.session.user.id)
       viewCategory = await adminHelper.viewAddCategory()
       documentCount = await userhelpers.documentCount()
@@ -295,8 +297,7 @@ module.exports = {
   //   }
 
   // },
-  getWishlist: (req, res) => {
-
+  getWishlist: async (req, res) => {
 
     wishlistHelper
       .addToWishList(req.query.wishid, req.session.user.id)
@@ -318,12 +319,12 @@ module.exports = {
 
   // },
   listWishList: async (req, res) => {
+    wishcount = await wishlistHelper.getWishCount(profileId)
 
     await wishlistHelper
       .ListWishList(req.session.user.id)
       .then((wishlistItems) => {
         console.log(wishlistItems);
-        console.log('jjjjjjjjjjjjjjjjjjjj');
 
         res.render("user/wishlist", {
           wishlistItems,

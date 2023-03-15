@@ -6,7 +6,7 @@ module.exports = {
             let count = 0;
             let wishlist = await db.wishlist.findOne({ user: userId })
             if (wishlist) {
-                count = wishlist.wishlistItems.length
+                count = wishlist.wishitems.length
             }
 
             resolve(count)
