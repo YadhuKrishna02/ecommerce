@@ -8,8 +8,9 @@
 
         <br />
 
-        <form action="/check_out" method="POST" id="checkout-form">
-          <% response.forEach(function(response) { %>
+        <% if (response.length!=0) { %>
+          <form action="/check_out" method="POST" id="checkout-form">
+              <% response.forEach(function(response) { %>
           <div>
             <div class="payment_option">
               <div
@@ -102,6 +103,11 @@
           </button>
         </form>
 
+      <% } else { %>
+          <h2>No Address Added</h2>
+
+        <% } %>
+
         <br />
         <div
           style="
@@ -114,6 +120,7 @@
           <a href="/add_address"> <h5>+ Add an address</h5></a>
         </div>
       </div>
+        
 
       <div class="col-md-6">
         <div class="order_review">

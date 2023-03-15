@@ -693,7 +693,6 @@ module.exports = {
   postCart: async (req, res) => {
 
 
-    console.log('hjhjjjjjjjjjj');
 
     const couponData = req.body
     couponName = req.body.couponName
