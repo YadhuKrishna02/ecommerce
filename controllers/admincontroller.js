@@ -388,7 +388,6 @@ module.exports = {
   },
   getOrderDetails: (req, res) => {
     adminHelper.orderDetails(req.query.orderid).then((order) => {
-      console.log(order, 'orderrrrrrrrrrrrrrrrrrrr');
       const getDate = (date) => {
         let orderDate = new Date(date);
         let day = orderDate.getDate();
